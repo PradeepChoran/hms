@@ -1,0 +1,10 @@
+name = Help Management System Starter
+description = Based on Minimal, enable just what's needed to make a Help Management System site.
+version = VERSION
+core = 7.x
+dependencies[] = block
+dependencies[] = dblog
+dependencies[] = goodhelp
+dependencies[] = media
+dependencies[] = wysiwyg
+files[] = hms_starter.profile
