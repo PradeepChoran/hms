@@ -1,0 +1,248 @@
+<?php
+/**
+ * @file
+ * Code for the Good Help module.
+ */
+
+include 'goodhelp.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function goodhelp_menu() {
+  $items = array();
+
+  $default = array(
+    'page callback' => '_goodhelp_topic_page',
+    'access arguments' => array('goodhelp topic review'),
+  );
+
+  $items['goodhelp/topic/%'] = array(
+    'title' => 'Help for "@topic"',
+    'title arguments' => array('@topic' => 2),
+    'page arguments' => array(2),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  ) + $default;
+  $items['goodhelp/topic/%/%'] = array(
+    'title' => 'Help topic for "@topic" on version "@version"',
+    'title arguments' => array('@topic' => 2, '@version' => 3),
+    'page arguments' => array(2, 3),
+    'type' => MENU_LOCAL_TASK,
+  ) + $default;
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function goodhelp_permission() {
+  return array(
+    'goodhelp topic review' => array(
+      'title' => t('Review Help Topic'),
+      'description' => t('Double check how help topics will appear to users for a given version of the topic.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_node_validate().
+ */
+function goodhelp_node_validate($node, $form, &$form_state) {
+  if ($node->type != 'goodhelp_topic') {
+    return;
+  }
+
+  // Check if the submitted help topic + version is unique.
+  $topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
+  $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['tid'];
+  $topic = _goodhelp_find_topic_instance($topic_id, (int) $version);
+
+  if (!empty($topic) && $version == $topic->version_id) {
+    if ($topic->nid != $node->nid){
+      form_set_error('field_goodhelp_topic_version', t('There is !already a page for this topic and version.', array(
+          '!already' => l(t('already'), 'node/' . $topic->nid),
+        ))
+      );
+    }
+  }
+}
+
+/**
+ * Build a page out of the routed help request.
+ */
+function _goodhelp_topic_page($topic_id, $version = NULL) {
+  $node = goodhelp_topic_load($topic_id, $version);
+  if (isset($node->nid)){
+    return node_view($node);
+  }
+}
+
+/**
+ * Load the short help tip for the specified topic.
+ *
+ * @param $id
+ *   Machine ID of the required topic.
+ * @param $version
+ *   Version of the topic to collect.
+ *
+ * @return
+ *   String of the prepared help text.
+ */
+function goodhelp_tip_load($topic_id, $version = NULL) {
+  $node = goodhelp_topic_load($topic_id, $version);
+  return "Looks like I don't know how to generate a node teaser in D7.";
+}
+
+/**
+ * Load the help topic node.
+ *
+ * @param $id
+ *   Machine ID of the required topic.
+ * @param $version
+ *   Version of the topic to collect.
+ *
+ * @return
+ *   Node object.
+ */
+function goodhelp_topic_load($topic_id, $version = NULL) {
+  $topic = _goodhelp_find_topic_instance($topic_id, $version);
+  if (isset($topic->nid)){
+    return node_load($topic->nid);
+  }
+}
+
+/**
+ * Identify the Node ID of the selected topic.
+ *
+ * @param $topic_id
+ *   Machine ID of the required topic.
+ * @param $version
+ *   Version of the topic to collect.
+ *
+ * @return
+ *   Topic object.
+ */
+function _goodhelp_find_topic_instance($topic_id, $version = NULL) {
+  $query = db_select('node', 'n');
+  $query->addField('n', 'nid');
+  $query->innerJoin('field_data_field_goodhelp_topic_id', 'gti', "gti.entity_id = n.nid AND gti.revision_id = n.vid AND gti.entity_type = 'node'");
+  $query->leftJoin('field_data_field_goodhelp_topic_version', 'gtv', "gtv.entity_id = n.nid AND gtv.revision_id = n.vid AND gtv.entity_type = 'node'");
+  $query
+    ->condition('n.status', 1, '=')
+    ->condition('gti.field_goodhelp_topic_id_value', $topic_id, '=')
+    ->range(0, 1)
+  ;
+
+  if (!empty($version)) {
+    $query->leftJoin('taxonomy_term_data', 'td', 'gtv.field_goodhelp_topic_version_tid = td.tid');
+    $query->addField('td', 'name', 'version_name');
+    $query->addField('td', 'tid', 'version_id');
+    $query->addExpression('ISNULL(td.tid)', 'default_text');
+    $query->orderBy('default_text', 'ASC');
+
+    if (is_string($version)) {
+      $query->condition(db_or()
+        ->isNull('td.tid')
+        ->condition('td.name', $version)
+      );
+    }
+    elseif (is_integer($version)) {
+      $query->condition(db_or()
+        ->isNull('td.tid')
+        ->condition('td.tid', $version)
+      );
+    }
+  }
+  else {
+    $query->isNull('gtv.field_goodhelp_topic_version_tid');
+  }
+
+  return $query->execute()->fetchObject();
+}
+
+/**
+ * Identify the Node ID of the selected topic.
+ *
+ * @param $topic_id
+ *   Machine ID of the required topic.
+ * @param $version
+ *   Version of the topic to collect.
+ *
+ * @return
+ *   Topic object converted to string.
+ */
+function goodhelp_topic_tostring($topic_id, $version = NULL) {
+  return print_r(_goodhelp_find_topic_instance($topic_id, $version), TRUE);
+}
+
+/**
+ * Implements hook_services_resource_alter.
+ * Add topic resource action and lookups to the service.
+ */
+function goodhelp_services_resources_alter(&$resources, $endpoint) {
+  // Retrieve the teaser or body of a given topic & version
+  // [POST] {endpoint}/topic/{topicname}/version/{version}/{tip|manual|guide}
+  $resources['topic']['relationships']['version'] = array(
+    'help' => 'Retrieve the teaser or body of a given topic & version',
+    'callback' => '_goodhelp_services_retrieve',
+    'args' => array(
+      array(
+        'name' => 'topic',
+        'type' => 'string',
+        'description' => 'A valid string topic name',
+        'source' => array('path' => '0'),
+        'optional' => FALSE,
+      ),
+      array(
+        'name' => 'version',
+        'type' => 'string',
+        'description' => 'A valid version of a given topic',
+        'source' => array('path' => '2'),
+        'optional' => TRUE,
+      ),
+      array(
+        'name' => 'size',
+        'type' => 'string',
+        'description' => 'Either tip, manual or guide, specifiying the size/type of the content to be returned',
+        'source' => array('path' => '3'),
+        'optional' => TRUE,
+      ),
+    ),
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'access arguments append' => FALSE,
+  );
+}
+
+/**
+ * Services callback for retrieving topic node details
+ */
+function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') {
+  $node = goodhelp_topic_load($topic, $version);
+
+  // Node sanity check
+  if (!isset($node->nid)) {
+    return services_error('Topic or version not found', 404);
+  }
+
+ switch ($size){
+    case 'tip':
+      $teaser = node_view($node, 'teaser');
+      $message = $teaser['body'][0]['#markup'];
+      break;
+    default:
+      $message = $node->body['und'][0]['safe_value'];
+  }
+
+  return array(
+      'response' => array(
+        'status' => 200,
+        'topic' => $topic,
+        'version' => $version,
+        'size' => $size,
+        'title' => $node->title,
+        'message' => $message,
+      )
+  );
+}
