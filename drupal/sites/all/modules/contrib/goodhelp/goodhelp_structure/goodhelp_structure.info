@@ -1,0 +1,6 @@
+name = "Good Help Structure"
+description = "Allows for structured Good Help books."
+core = "7.x"
+package = "Good Help"
+dependencies[] = "goodhelp"
+dependencies[] = "book"

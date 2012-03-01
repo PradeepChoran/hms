@@ -254,15 +254,31 @@ function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') 
 }
 
 /**
- * Options callback for the goodhelp_product field.
+ * Allowed values callback for the goodhelp_topic_product field.
  */
 function goodhelp_product_options() {
-  return array();
+  $product_info = goodhelp_get_product_info();
+  $products = array_keys($product_info);
+  return $products;
 }
 
 /**
- * Options callback for the goodhelp_topic_version field.
+ * Allowed values callback for the goodhelp_topic_version field.
  */
-function goodhelp_version_options() {
-  return array();
+function goodhelp_version_options($product = NULL) {
+  $versions = array();
+  if ($product != NULL) {
+    $products = goodhelp_get_product_info();
+    if (isset($products[$product])) {
+      $versions = $products[$product];
+    }
+  }
+  return $versions;
+}
+
+/**
+ * Returns all user-defined products.
+ */
+function goodhelp_get_product_info() {
+  return module_invoke_all('goodhelp_product_info');
 }

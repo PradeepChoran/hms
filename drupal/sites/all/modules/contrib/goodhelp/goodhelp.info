@@ -1,7 +1,7 @@
 name = "Good Help"
 description = "Because it's hard to find."
 core = "7.x"
-package = "Other"
+package = "Good Help"
 php = "5.2.4"
 dependencies[] = "features"
 dependencies[] = "list"

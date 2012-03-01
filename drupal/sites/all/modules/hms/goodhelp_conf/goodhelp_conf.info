@@ -1,0 +1,5 @@
+name = "Good Help Conf"
+description = "Configures goodhelp"
+core = "7.x"
+package = "HMS"
+dependencies[] = "goodhelp_structure"

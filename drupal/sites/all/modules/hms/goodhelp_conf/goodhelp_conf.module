@@ -1,0 +1,20 @@
+<?php
+/**
+ * @file
+ * Main code for the Good Help Conf module.
+ */
+
+/**
+ * Implements goodhelp_product_info().
+ */
+function goodhelp_conf_goodhelp_product_info() {
+  return array(
+    'NOC' => array(
+      '4.6',
+      '4.7',
+      '4.7.1',
+      '4.8',
+      '4.9',
+    ),
+  );
+}
