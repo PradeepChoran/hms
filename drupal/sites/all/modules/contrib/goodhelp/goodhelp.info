@@ -27,10 +27,3 @@ features[variable][] = "node_submitted_goodhelp_topic"
 name = "Good Help"
 package = "Other"
 php = "5.2.4"
-
-; Information added by drupal.org packaging script on 2011-12-23
-version = "7.x-1.0-alpha1"
-core = "7.x"
-project = "goodhelp"
-datestamp = "1324620951"
-
