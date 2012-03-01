@@ -217,30 +217,19 @@ function goodhelp_field_default_fields() {
       'deleted' => '0',
       'entity_types' => array(),
       'field_name' => 'field_goodhelp_topic_version',
-      'foreign keys' => array(
-        'tid' => array(
-          'columns' => array(
-            'tid' => 'tid',
-          ),
-          'table' => 'taxonomy_term_data',
-        ),
-      ),
+      'foreign keys' => array(),
       'indexes' => array(
-        'tid' => array(
-          0 => 'tid',
+        'value' => array(
+          0 => 'value',
         ),
       ),
-      'module' => 'taxonomy',
+      'module' => 'list',
       'settings' => array(
-        'allowed_values' => array(
-          0 => array(
-            'vocabulary' => 'goodhelp_topic_version',
-            'parent' => '0',
-          ),
-        ),
+        'allowed_values' => array(),
+        'allowed_values_function' => '',
       ),
       'translatable' => '0',
-      'type' => 'taxonomy_term_reference',
+      'type' => 'list_text',
     ),
     'field_instance' => array(
       'bundle' => 'goodhelp_topic',
@@ -249,10 +238,11 @@ function goodhelp_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'hidden',
+          'label' => 'above',
+          'module' => 'list',
           'settings' => array(),
-          'type' => 'hidden',
-          'weight' => '2',
+          'type' => 'list_default',
+          'weight' => 4,
         ),
         'teaser' => array(
           'label' => 'above',
@@ -264,7 +254,7 @@ function goodhelp_field_default_fields() {
       'entity_type' => 'node',
       'field_name' => 'field_goodhelp_topic_version',
       'label' => 'Version',
-      'required' => 0,
+      'required' => 1,
       'settings' => array(
         'user_register_form' => FALSE,
       ),
@@ -273,7 +263,7 @@ function goodhelp_field_default_fields() {
         'module' => 'options',
         'settings' => array(),
         'type' => 'options_select',
-        'weight' => '2',
+        'weight' => '5',
       ),
     ),
   );
