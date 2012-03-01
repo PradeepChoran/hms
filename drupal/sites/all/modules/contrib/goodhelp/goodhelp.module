@@ -54,7 +54,8 @@ function goodhelp_node_validate($node, $form, &$form_state) {
   }
 
   // Check if the submitted help topic + version is unique.
-  $topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
+  // Commenting this out while developing new impl. of versions
+  /*$topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
   $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['tid'];
   $topic = _goodhelp_find_topic_instance($topic_id, (int) $version);
 
@@ -65,7 +66,7 @@ function goodhelp_node_validate($node, $form, &$form_state) {
         ))
       );
     }
-  }
+  }*/
 }
 
 /**
@@ -254,26 +255,61 @@ function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') 
 }
 
 /**
+ * Implements hook_field_attach_form().
+ */
+function goodhelp_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode = NULL) {
+  // Alter the goodhelp_topic form.
+  if ($entity->type == 'goodhelp_topic') {
+    // Make version field dependent on product.
+    $form['field_goodhelp_topic_product']['und']['#ajax'] = array(
+      'wrapper' => 'goodhelp-version-ajax-wrapper',
+      'callback'=> 'goodhelp_version_ajax_callback',
+    );
+    $form['field_goodhelp_topic_version']['#prefix'] = '<div id="goodhelp-version-ajax-wrapper">';
+    $form['field_goodhelp_topic_version']['#suffix'] = '</div>';
+    
+    // Update the version field if there is a product selected in form_state.
+    if (isset($form_state['values']['field_goodhelp_topic_product'])) {
+      $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
+      $form['field_goodhelp_topic_version']['und']['#options'] = goodhelp_version_options(NULL, $product);
+    }
+  }
+  
+}
+
+/**
+ * Ajax callback for the Topic Version field.
+ */
+function goodhelp_version_ajax_callback($form, &$form_state) {
+  return $form['field_goodhelp_topic_version'];
+}
+
+/**
  * Allowed values callback for the goodhelp_topic_product field.
  */
 function goodhelp_product_options() {
   $product_info = goodhelp_get_product_info();
-  $products = array_keys($product_info);
+  $products = drupal_map_assoc(array_keys($product_info));
   return $products;
 }
 
 /**
  * Allowed values callback for the goodhelp_topic_version field.
+ * 
+ * @param $field_info
+ *  Specified by the field module when it calls this function.
+ * @param $product
+ *  A product name to return the versions for.
  */
-function goodhelp_version_options($product = NULL) {
+function goodhelp_version_options($field_info = NULL, $product = NULL) {
   $versions = array();
-  if ($product != NULL) {
+  if ($product) {
     $products = goodhelp_get_product_info();
     if (isset($products[$product])) {
       $versions = $products[$product];
     }
   }
-  return $versions;
+  return drupal_map_assoc($versions);
 }
 
 /**
