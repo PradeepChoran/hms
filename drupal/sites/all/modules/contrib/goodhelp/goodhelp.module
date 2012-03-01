@@ -252,3 +252,17 @@ function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') 
       )
   );
 }
+
+/**
+ * Options callback for the goodhelp_product field.
+ */
+function goodhelp_product_options() {
+  return array();
+}
+
+/**
+ * Options callback for the goodhelp_topic_version field.
+ */
+function goodhelp_version_options() {
+  return array();
+}

@@ -99,7 +99,7 @@ function goodhelp_field_default_fields() {
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(),
-        'allowed_values_function' => '',
+        'allowed_values_function' => 'goodhelp_product_options',
       ),
       'translatable' => '0',
       'type' => 'list_text',
@@ -226,7 +226,7 @@ function goodhelp_field_default_fields() {
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(),
-        'allowed_values_function' => '',
+        'allowed_values_function' => 'goodhelp_version_options',
       ),
       'translatable' => '0',
       'type' => 'list_text',
