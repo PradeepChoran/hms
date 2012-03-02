@@ -12,6 +12,14 @@ include 'goodhelp.features.inc';
 function goodhelp_menu() {
   $items = array();
 
+  // Configuration page for googhelp.
+  $items['admin/config/content/goodhelp'] = array(
+    'title' => 'Good Help Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('goodhelp_settings_form'),
+    'access arguments' => array('access administration pages'),
+  );
+
   $default = array(
     'page callback' => '_goodhelp_topic_page',
     'access arguments' => array('goodhelp topic review'),
@@ -31,6 +39,37 @@ function goodhelp_menu() {
   ) + $default;
 
   return $items;
+}
+
+/**
+ * 
+ */
+function goodhelp_settings_form() {
+  $form = array();
+  goodhelp_get_supported_versions('noc');
+  $form['goodhelp_max_versions'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Maximum Supported Versions',
+    '#description' => t('Select the maximum supported versions for each product'),
+    '#tree' => TRUE,
+  );
+  
+  // Get all products.
+  $products = goodhelp_get_product_info();
+  
+  // Build version selection forms for each one.
+  $max = variable_get('goodhelp_max_versions', array());
+  foreach ($products as $product => $info) {
+    $form['goodhelp_max_versions'][$product] = array(
+      '#title' => $info['name'],
+      '#type' => 'select',
+      '#options' => drupal_map_assoc(array('1', '2', '3', '4', '5')),
+      '#default_value' => $max[$product],
+    );
+  }
+  
+  $form = system_settings_form($form);
+  return $form;
 }
 
 /**
@@ -288,8 +327,11 @@ function goodhelp_version_ajax_callback($form, &$form_state) {
  * Allowed values callback for the goodhelp_topic_product field.
  */
 function goodhelp_product_options() {
+  $products = array();
   $product_info = goodhelp_get_product_info();
-  $products = drupal_map_assoc(array_keys($product_info));
+  foreach ($product_info as $product => $info) {
+    $products[$product] = $info['name'];
+  }
   return $products;
 }
 
@@ -306,7 +348,7 @@ function goodhelp_version_options($field_info = NULL, $product = NULL) {
   if ($product) {
     $products = goodhelp_get_product_info();
     if (isset($products[$product])) {
-      $versions = $products[$product];
+      $versions = $products[$product]['versions'];
     }
   }
   return drupal_map_assoc($versions);
@@ -318,3 +360,40 @@ function goodhelp_version_options($field_info = NULL, $product = NULL) {
 function goodhelp_get_product_info() {
   return module_invoke_all('goodhelp_product_info');
 }
+
+/**
+ * Returns TRUE if the product has hit the maximum supported versions, FALSE otherwise.
+ */
+function goodhelp_hit_max($product) {
+  $max = goodhelp_max_versions($product);
+  $supported = count(goodhelp_get_supported_versions($product));
+  if ($supported >= $max) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Get the max supported versions for a product.
+ */
+function goodhelp_max_versions($product) {
+  $maxes = variable_get('goodhelp_max_versions', array());
+  if (isset($maxes[$product])) {
+    return $maxes[$product];
+  }
+  return 0;
+}
+
+/**
+ * Returns a list of the versions currently supported for the given product.
+ */
+function goodhelp_get_supported_versions($product) {
+  $query = db_select('field_revision_field_goodhelp_topic_version', 'ver');
+  $query->addField('ver', 'field_goodhelp_topic_version_value', 'value');
+  $query->leftJoin('field_revision_field_goodhelp_topic_product', 'prod', "ver.entity_id = prod.entity_id");
+  $query->condition('prod.field_goodhelp_topic_product_value', $product, '=');
+  $query->distinct();
+  $result = $query->execute()->fetchCol();
+  return $result;
+}
+
