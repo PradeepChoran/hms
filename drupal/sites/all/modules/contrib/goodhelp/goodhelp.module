@@ -310,7 +310,13 @@ function goodhelp_field_attach_form($entity_type, $entity, &$form, &$form_state,
     // Update the version field if there is a product selected in form_state.
     if (isset($form_state['values']['field_goodhelp_topic_product'])) {
       $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
-      $form['field_goodhelp_topic_version']['und']['#options'] = goodhelp_version_options(NULL, $product);
+      if (goodhelp_hit_max($product)) {
+        $options = array();
+      }
+      else {
+        $options = goodhelp_version_options(NULL, $product);
+      }
+      $form['field_goodhelp_topic_version']['und']['#options'] = $options;
     }
   }
   
