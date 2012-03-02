@@ -311,7 +311,8 @@ function goodhelp_field_attach_form($entity_type, $entity, &$form, &$form_state,
     if (isset($form_state['values']['field_goodhelp_topic_product'])) {
       $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
       if (goodhelp_hit_max($product)) {
-        $options = array();
+        $options = goodhelp_get_supported_versions($product);
+        drupal_set_message(t('The maximum number of versions is already being supported for this product, so you may only add pages for one of those versions. To start help for a new version, you must first remove support for an earlier version.'), 'warning');
       }
       else {
         $options = goodhelp_version_options(NULL, $product);
