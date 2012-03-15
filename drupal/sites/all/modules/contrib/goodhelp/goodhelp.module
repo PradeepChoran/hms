@@ -264,33 +264,35 @@ function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') 
 }
 
 /**
- * Implements hook_field_attach_form().
+ * Implements hook_field_form_FORM_ID_alter().
  */
-function goodhelp_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode = NULL) {
-  // Alter the goodhelp_topic form.
-  if ($entity->type == 'goodhelp_topic') {
-    // Make version field dependent on product.
-    $form['field_goodhelp_topic_product']['und']['#ajax'] = array(
-      'wrapper' => 'goodhelp-version-ajax-wrapper',
-      'callback'=> 'goodhelp_version_ajax_callback',
-    );
-    $form['field_goodhelp_topic_version']['#prefix'] = '<div id="goodhelp-version-ajax-wrapper">';
-    $form['field_goodhelp_topic_version']['#suffix'] = '</div>';
-    
-    // Update the version field if there is a product selected in form_state.
-    if (isset($form_state['values']['field_goodhelp_topic_product'])) {
-      $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
-      if (goodhelp_hit_max($product)) {
-        $options = goodhelp_get_supported_versions($product);
-        drupal_set_message(t('The maximum number of versions is already being supported for this product, so you may only add pages for one of those versions. To start help for a new version, you must first remove support for an earlier version.'), 'warning');
-      }
-      else {
-        $options = goodhelp_version_options(NULL, $product);
-      }
-      $form['field_goodhelp_topic_version']['und']['#options'] = $options;
-    }
-  }
+function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
+  // Make version field dependent on product.
+  $form['field_goodhelp_topic_product']['und']['#ajax'] = array(
+    'wrapper' => 'goodhelp-version-ajax-wrapper',
+    'callback'=> 'goodhelp_version_ajax_callback',
+  );
+  $form['field_goodhelp_topic_version']['#prefix'] = '<div id="goodhelp-version-ajax-wrapper">';
+  $form['field_goodhelp_topic_version']['#suffix'] = '</div>';
   
+  // Update the version field if there is a product selected in form_state.
+  if (isset($form_state['values']['field_goodhelp_topic_product'])) {
+    $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
+    if (goodhelp_hit_max($product)) {
+      $options = goodhelp_get_supported_versions($product);
+      drupal_set_message(t('The maximum number of versions is already being supported for this product, so you may only add pages for one of those versions. To start help for a new version, you must first remove support for an earlier version.'), 'warning');
+    }
+    else {
+      $options = goodhelp_version_options(NULL, $product);
+    }
+    $form['field_goodhelp_topic_version']['und']['#options'] = $options;
+  }
+  else if (arg(2) == 'edit') {
+    // Set the options for the versions field.
+    $product = $form['field_goodhelp_topic_product']['und']['#default_value'][0];
+    $options = goodhelp_version_options(NULL, $product);
+    $form['field_goodhelp_topic_version']['und']['#options'] = $options;
+  }
 }
 
 /**
@@ -371,6 +373,18 @@ function goodhelp_get_supported_versions($product) {
   $query->condition('prod.field_goodhelp_topic_product_value', $product, '=');
   $query->distinct();
   $result = $query->execute()->fetchCol();
-  return $result;
+  return drupal_map_assoc($result);
 }
 
+/**
+ * Returns an array of all the possible version names. This serves as the allowed 
+ * values callback for the version field.
+ */
+function goodhelp_get_all_versions() {
+  $versions = array();
+  $info = goodhelp_get_product_info();
+  foreach($info as $product) {
+    $versions += drupal_map_assoc($product['versions']);
+  }
+  return $versions;
+}

@@ -1,7 +1,7 @@
 name = "HMS Conf"
 description = "Configures the HMS."
 core = "7.x"
-package = "Features"
+package = "HMS"
 dependencies[] = "ctools"
 dependencies[] = "strongarm"
 features[ctools][] = "strongarm:strongarm:1"

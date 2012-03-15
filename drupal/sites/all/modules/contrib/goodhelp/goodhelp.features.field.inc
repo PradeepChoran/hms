@@ -226,7 +226,7 @@ function goodhelp_field_default_fields() {
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(),
-        'allowed_values_function' => 'goodhelp_version_options',
+        'allowed_values_function' => 'goodhelp_get_all_versions',
       ),
       'translatable' => '0',
       'type' => 'list_text',

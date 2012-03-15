@@ -3,3 +3,53 @@
  * @file
  * Main code for Good Help Structure module.
  */
+
+/**
+ * Implements hook_field_form_FORM_ID_alter().
+ */
+function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
+  // Make some changes to the book fieldset.
+  $book = &$form['book'];
+  // Take the book fieldset out of the 'additional settings' vertical tabs group.
+  unset($book['#group']);
+  // Change some other settings.
+  $book['#weight'] = -50;
+  $book['#collapsible'] = FALSE;
+  $book['#collapsed'] = FALSE;
+  // Remove weight just to simplify things. Can be changed via book UI.
+  $book['weight']['#access'] = FALSE;  
+  // Add a validation function.
+  $form['#validate'][] = 'goodhelp_structure_validate_structure';
+}
+
+/**
+ * Validate callback for help topics.
+ */
+function goodhelp_structure_validate_structure($form, &$form_state) {
+  // Make sure that the selected version is also the selected book's version.
+  $bid = $form_state['values']['book']['bid'];
+  if (is_numeric($bid) && $bid != 0) {
+    $book_info = goodhelp_structure_get_book_info($bid);
+    $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
+    $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
+    if ($product != $book_info['product'] || $version != $book_info['version']) {
+      form_set_error('field_goodhelp_topic_product', t('You must select a product and version that match the product and version for the book you selected.'));
+    }
+  }
+}
+
+/**
+ * Returns product and version information for the given book.
+ */
+function goodhelp_structure_get_book_info($bid) {
+  $node = node_load($bid);
+  $product_field_items = field_get_items('node', $node, 'field_goodhelp_topic_product');
+  $product = $product_field_items[0]['value'];
+  $version_field_items = field_get_items('node', $node, 'field_goodhelp_topic_version');
+  $version = $version_field_items[0]['value'];
+  $info = array(
+    'product' => $product,
+    'version' => $version,
+  );
+  return $info;
+}
