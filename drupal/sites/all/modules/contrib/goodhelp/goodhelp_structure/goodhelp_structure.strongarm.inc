@@ -25,6 +25,6 @@ function goodhelp_structure_strongarm() {
   $strongarm->name = 'book_child_type';
   $strongarm->value = 'goodhelp_topic';
   $export['book_child_type'] = $strongarm;
-  
+
   return $export;
 }
