@@ -276,7 +276,7 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
   $form['field_goodhelp_topic_version']['#suffix'] = '</div>';
   
   // Update the version field if there is a product selected in form_state.
-  if (isset($form_state['values']['field_goodhelp_topic_product'])) {
+  if (isset($form_state['values']['field_goodhelp_topic_product']['und'][0]['value'])) {
     $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
     if (goodhelp_hit_max($product)) {
       $options = goodhelp_get_supported_versions($product);
@@ -292,6 +292,10 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
     $product = $form['field_goodhelp_topic_product']['und']['#default_value'][0];
     $options = goodhelp_version_options(NULL, $product);
     $form['field_goodhelp_topic_version']['und']['#options'] = $options;
+  }
+  else {
+    $form['field_goodhelp_topic_version']['und']['#options'] = array('- Select a value -');
+    $form['field_goodhelp_topic_version']['und']['#disabled'] = TRUE;
   }
 }
 
