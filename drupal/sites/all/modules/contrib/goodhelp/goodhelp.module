@@ -121,7 +121,7 @@ function goodhelp_tip_load($topic_id, $version = NULL) {
  *   Node object.
  */
 function goodhelp_topic_load($topic_id, $product, $version) {
-  $topic = _goodhelp_find_topic_instance($topic_id, $version);
+  $topic = _goodhelp_find_topic_instance($topic_id, $product, $version);
   if (isset($topic->nid)){
     return node_load($topic->nid);
   }
@@ -177,8 +177,8 @@ function goodhelp_topic_tostring($topic_id, $product, $version) {
 function goodhelp_services_resources_alter(&$resources, $endpoint) {
   // Retrieve the teaser or body of a given topic & version
   // [POST] {endpoint}/topic/{topicname}/product/{productname}/version/{version}/{tip|manual|guide}
-  $resources['topic']['relationships']['version'] = array(
-    'help' => 'Retrieve the teaser or body of a given topic & version',
+  $resources['topic']['relationships']['product'] = array(
+    'help' => 'Retrieve the teaser or body of a given topic, product, and version',
     'callback' => '_goodhelp_services_retrieve',
     'args' => array(
       array(
@@ -193,14 +193,14 @@ function goodhelp_services_resources_alter(&$resources, $endpoint) {
         'type' => 'string',
         'description' => 'A valid product name',
         'source' => array('path' => '2'),
-        'optional' => TRUE,
+        'optional' => FALSE,
       ),
       array(
         'name' => 'version',
         'type' => 'string',
         'description' => 'A valid version of a given topic',
         'source' => array('path' => '4'),
-        'optional' => TRUE,
+        'optional' => FALSE,
       ),
       array(
         'name' => 'size',
@@ -220,10 +220,7 @@ function goodhelp_services_resources_alter(&$resources, $endpoint) {
  * Services callback for retrieving topic node details
  */
 function _goodhelp_services_retrieve($topic, $product, $version, $size = 'manual') {
-  dpm('in retrieve');
-  dpm("t $topic, p $product, v $version, s $size");
-  return '';
-  $node = goodhelp_topic_load($topic, $version);
+  $node = goodhelp_topic_load($topic, $product, $version);
 
   // Node sanity check
   if (!isset($node->nid)) {
