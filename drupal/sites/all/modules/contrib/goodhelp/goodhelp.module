@@ -62,11 +62,11 @@ function goodhelp_node_validate($node, $form, &$form_state) {
     return;
   }
 
-  // Check if the submitted help topic + version is unique.
-  // Commenting this out while developing new impl. of versions
-  /*$topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
-  $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['tid'];
-  $topic = _goodhelp_find_topic_instance($topic_id, (int) $version);
+  // Check if the submitted help topic + product + version is unique.
+  $topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
+  $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
+  $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
+  $topic = _goodhelp_find_topic_instance($topic_id, $product, $version);
 
   if (!empty($topic) && $version == $topic->version_id) {
     if ($topic->nid != $node->nid){
@@ -75,7 +75,7 @@ function goodhelp_node_validate($node, $form, &$form_state) {
         ))
       );
     }
-  }*/
+  }
 }
 
 /**
@@ -120,7 +120,7 @@ function goodhelp_tip_load($topic_id, $version = NULL) {
  * @return
  *   Node object.
  */
-function goodhelp_topic_load($topic_id, $version = NULL) {
+function goodhelp_topic_load($topic_id, $product, $version) {
   $topic = _goodhelp_find_topic_instance($topic_id, $version);
   if (isset($topic->nid)){
     return node_load($topic->nid);
@@ -138,40 +138,18 @@ function goodhelp_topic_load($topic_id, $version = NULL) {
  * @return
  *   Topic object.
  */
-function _goodhelp_find_topic_instance($topic_id, $version = NULL) {
+function _goodhelp_find_topic_instance($topic_id, $product, $version) {
   $query = db_select('node', 'n');
   $query->addField('n', 'nid');
   $query->innerJoin('field_data_field_goodhelp_topic_id', 'gti', "gti.entity_id = n.nid AND gti.revision_id = n.vid AND gti.entity_type = 'node'");
   $query->leftJoin('field_data_field_goodhelp_topic_version', 'gtv', "gtv.entity_id = n.nid AND gtv.revision_id = n.vid AND gtv.entity_type = 'node'");
+  $query->leftJoin('field_data_field_goodhelp_topic_product', 'gtp', "gtp.entity_id = n.nid AND gtp.revision_id = n.vid AND gtp.entity_type = 'node'");
   $query
     ->condition('n.status', 1, '=')
     ->condition('gti.field_goodhelp_topic_id_value', $topic_id, '=')
-    ->range(0, 1)
-  ;
-
-  if (!empty($version)) {
-    $query->leftJoin('taxonomy_term_data', 'td', 'gtv.field_goodhelp_topic_version_tid = td.tid');
-    $query->addField('td', 'name', 'version_name');
-    $query->addField('td', 'tid', 'version_id');
-    $query->addExpression('ISNULL(td.tid)', 'default_text');
-    $query->orderBy('default_text', 'ASC');
-
-    if (is_string($version)) {
-      $query->condition(db_or()
-        ->isNull('td.tid')
-        ->condition('td.name', $version)
-      );
-    }
-    elseif (is_integer($version)) {
-      $query->condition(db_or()
-        ->isNull('td.tid')
-        ->condition('td.tid', $version)
-      );
-    }
-  }
-  else {
-    $query->isNull('gtv.field_goodhelp_topic_version_tid');
-  }
+    ->condition('gtp.field_goodhelp_topic_product_value', $product, '=')
+    ->condition('gtv.field_goodhelp_topic_version_value', $version, '=')
+    ->range(0, 1);
 
   return $query->execute()->fetchObject();
 }
@@ -187,7 +165,7 @@ function _goodhelp_find_topic_instance($topic_id, $version = NULL) {
  * @return
  *   Topic object converted to string.
  */
-function goodhelp_topic_tostring($topic_id, $version = NULL) {
+function goodhelp_topic_tostring($topic_id, $product, $version) {
   return print_r(_goodhelp_find_topic_instance($topic_id, $version), TRUE);
 }
 
@@ -198,7 +176,7 @@ function goodhelp_topic_tostring($topic_id, $version = NULL) {
  */
 function goodhelp_services_resources_alter(&$resources, $endpoint) {
   // Retrieve the teaser or body of a given topic & version
-  // [POST] {endpoint}/topic/{topicname}/version/{version}/{tip|manual|guide}
+  // [POST] {endpoint}/topic/{topicname}/product/{productname}/version/{version}/{tip|manual|guide}
   $resources['topic']['relationships']['version'] = array(
     'help' => 'Retrieve the teaser or body of a given topic & version',
     'callback' => '_goodhelp_services_retrieve',
@@ -211,17 +189,24 @@ function goodhelp_services_resources_alter(&$resources, $endpoint) {
         'optional' => FALSE,
       ),
       array(
+        'name' => 'product',
+        'type' => 'string',
+        'description' => 'A valid product name',
+        'source' => array('path' => '2'),
+        'optional' => TRUE,
+      ),
+      array(
         'name' => 'version',
         'type' => 'string',
         'description' => 'A valid version of a given topic',
-        'source' => array('path' => '2'),
+        'source' => array('path' => '4'),
         'optional' => TRUE,
       ),
       array(
         'name' => 'size',
         'type' => 'string',
         'description' => 'Either tip, manual or guide, specifiying the size/type of the content to be returned',
-        'source' => array('path' => '3'),
+        'source' => array('path' => '5'),
         'optional' => TRUE,
       ),
     ),
@@ -234,7 +219,10 @@ function goodhelp_services_resources_alter(&$resources, $endpoint) {
 /**
  * Services callback for retrieving topic node details
  */
-function _goodhelp_services_retrieve($topic, $version = NULL, $size = 'manual') {
+function _goodhelp_services_retrieve($topic, $product, $version, $size = 'manual') {
+  dpm('in retrieve');
+  dpm("t $topic, p $product, v $version, s $size");
+  return '';
   $node = goodhelp_topic_load($topic, $version);
 
   // Node sanity check
