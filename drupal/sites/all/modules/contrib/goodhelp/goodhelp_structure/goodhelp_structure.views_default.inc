@@ -45,6 +45,8 @@ function goodhelp_structure_views_default_views() {
     'title' => 'title',
     'field_goodhelp_topic_product' => 'field_goodhelp_topic_product',
     'field_goodhelp_topic_version' => 'field_goodhelp_topic_version',
+    'nid' => 'nid',
+    'nothing' => 'nothing',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
@@ -65,6 +67,18 @@ function goodhelp_structure_views_default_views() {
     'field_goodhelp_topic_version' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'nid' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'nothing' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -184,11 +198,15 @@ function goodhelp_structure_views_default_views() {
   $handler->display->display_options['fields']['nothing']['hide_empty'] = 0;
   $handler->display->display_options['fields']['nothing']['empty_zero'] = 0;
   $handler->display->display_options['fields']['nothing']['hide_alter_empty'] = 0;
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Sort criterion: Content: Product (field_goodhelp_topic_product) */
+  $handler->display->display_options['sorts']['field_goodhelp_topic_product_value']['id'] = 'field_goodhelp_topic_product_value';
+  $handler->display->display_options['sorts']['field_goodhelp_topic_product_value']['table'] = 'field_data_field_goodhelp_topic_product';
+  $handler->display->display_options['sorts']['field_goodhelp_topic_product_value']['field'] = 'field_goodhelp_topic_product_value';
+  /* Sort criterion: Content: Version (field_goodhelp_topic_version) */
+  $handler->display->display_options['sorts']['field_goodhelp_topic_version_value']['id'] = 'field_goodhelp_topic_version_value';
+  $handler->display->display_options['sorts']['field_goodhelp_topic_version_value']['table'] = 'field_data_field_goodhelp_topic_version';
+  $handler->display->display_options['sorts']['field_goodhelp_topic_version_value']['field'] = 'field_goodhelp_topic_version_value';
+  $handler->display->display_options['sorts']['field_goodhelp_topic_version_value']['order'] = 'DESC';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
