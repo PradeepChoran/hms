@@ -24,18 +24,18 @@ function goodhelp_default_services_endpoint() {
       'formatters' => array(
         'json' => TRUE,
         'jsonp' => TRUE,
+        'xml' => TRUE,
         'bencode' => FALSE,
         'php' => FALSE,
         'rss' => FALSE,
-        'xml' => TRUE,
         'yaml' => FALSE,
       ),
       'parsers' => array(
         'application/json' => TRUE,
         'application/x-www-form-urlencoded' => TRUE,
+        'multipart/form-data' => TRUE,
         'application/vnd.php.serialized' => FALSE,
         'application/x-yaml' => FALSE,
-        'multipart/form-data' => TRUE,
       ),
     ),
   );
@@ -71,6 +71,13 @@ function goodhelp_default_services_endpoint() {
           'enabled' => 1,
         ),
         'logout' => array(
+          'enabled' => 1,
+        ),
+      ),
+    ),
+    'topic' => array(
+      'relationships' => array(
+        'product' => array(
           'enabled' => 1,
         ),
       ),
