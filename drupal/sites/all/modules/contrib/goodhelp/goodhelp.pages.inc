@@ -21,7 +21,7 @@ function goodhelp_settings_form() {
   $products = goodhelp_get_product_info();
   
   // Build version selection forms for each one.
-  $max = variable_get('goodhelp_max_versions', array());
+  $max = variable_get('goodhelp_max_versions', array_fill_keys(array_keys($products), 0));
   foreach ($products as $product => $info) {
     $supported = goodhelp_get_supported_versions($product);
     $description = count($supported) . ' versions currently supported in the system.';
@@ -29,7 +29,7 @@ function goodhelp_settings_form() {
       '#title' => $info['name'],
       '#description' => $description,
       '#type' => 'select',
-      '#options' => drupal_map_assoc(range(1, 6)),
+      '#options' => drupal_map_assoc(range(0, 6)),
       '#default_value' => $max[$product],
     );
   }

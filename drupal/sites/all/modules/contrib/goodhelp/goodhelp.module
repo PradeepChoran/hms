@@ -298,7 +298,9 @@ function goodhelp_product_options() {
   $products = array();
   $product_info = goodhelp_get_product_info();
   foreach ($product_info as $product => $info) {
-    $products[$product] = $info['name'];
+    if (goodhelp_max_versions($product) != 0) {
+      $products[$product] = $info['name'];
+    }
   }
   return $products;
 }
