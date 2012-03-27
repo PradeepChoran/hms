@@ -3,6 +3,7 @@
  * @file
  * Main code for Good Help Structure module.
  */
+include_once('goodhelp_structure.features.inc');
 
 /**
  * Implements hook_field_form_FORM_ID_alter().
