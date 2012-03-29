@@ -297,14 +297,15 @@ function _goodhelp_services_retrieve($topic, $product, $version, $size = 'manual
   }
 
   return array(
-      'response' => array(
-        'status' => 200,
-        'topic' => $topic,
-        'version' => $version,
-        'size' => $size,
-        'title' => $node->title,
-        'message' => $message,
-      )
+    'response' => array(
+      'status' => 200,
+      'topic' => $topic,
+      'requestedVersion' => $version,
+      'version' => $node->field_goodhelp_topic_version['und'][0]['value'],
+      'size' => $size,
+      'title' => $node->title,
+      'message' => $message,
+    ),
   );
 }
 

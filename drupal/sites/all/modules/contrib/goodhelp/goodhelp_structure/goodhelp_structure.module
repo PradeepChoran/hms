@@ -18,7 +18,25 @@ function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_s
   $book['#collapsible'] = FALSE;
   $book['#collapsed'] = FALSE;
   // Remove weight just to simplify things. Can be changed via book UI.
-  $book['weight']['#access'] = FALSE;  
+  $book['weight']['#access'] = FALSE; 
+  
+  $form['title']['#description'] = t('Enter a human readable title for this page, which will appear at the top of the help page.');
+  // If the parent is preset, we are creating a child page. Simplify things.
+  if ($parent = $_GET['parent']) {
+    $book['#collapsible'] = TRUE;
+    $book['#disabled'] = TRUE;
+    // Preset the product and version info.
+    $bid = goodhelp_structure_get_bid($parent);
+    if ($bid) {
+      $info = goodhelp_structure_get_book_info($bid);
+      $product = $info['product'];
+      $version = $info['version'];
+      $form['field_goodhelp_topic_product']['und']['#default_value'] = $product;
+      $form['field_goodhelp_topic_product']['und']['#disabled'] = TRUE;
+      $form['field_goodhelp_topic_version']['und']['#options'] = drupal_map_assoc(array($version));
+      $form['field_goodhelp_topic_version']['und']['#default_value'] = $version;
+    }
+  } 
   // Add a validation function.
   $form['#validate'][] = 'goodhelp_structure_validate_structure';
 }
@@ -53,4 +71,22 @@ function goodhelp_structure_get_book_info($bid) {
     'version' => $version,
   );
   return $info;
+}
+
+/**
+ * Returns the book id (nid of the top level page) for the given menu link id.
+ *
+ * @param $mlid
+ *  A menu link id that corresponds to a book page.
+ * 
+ * @return the bid of the book that the given $mlid is in, or FALSE;
+ */
+function goodhelp_structure_get_bid($mlid) {
+  $query = db_select('book');
+  $query->addField('book', 'bid');
+  $query->condition('book.mlid', $mlid, '=');
+  if ($bid = $query->execute()->fetchField()) {
+    return $bid;
+  }
+  return FALSE;
 }

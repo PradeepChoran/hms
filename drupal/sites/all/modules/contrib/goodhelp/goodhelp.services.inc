@@ -10,7 +10,7 @@
 function goodhelp_default_services_endpoint() {
   $export = array();
 
-  $endpoint = new stdClass;
+  $endpoint = new stdClass();
   $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
   $endpoint->api_version = 3;
   $endpoint->name = 'goodhelp_rest';

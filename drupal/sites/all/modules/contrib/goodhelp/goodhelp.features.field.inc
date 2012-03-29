@@ -114,7 +114,7 @@ function goodhelp_field_default_fields() {
       'bundle' => 'goodhelp_topic',
       'default_value' => NULL,
       'deleted' => '0',
-      'description' => '',
+      'description' => 'Enter a topic id for this topic. Lower case letters and underscores only.',
       'display' => array(
         'default' => array(
           'label' => 'inline',
@@ -142,7 +142,7 @@ function goodhelp_field_default_fields() {
         'active' => 1,
         'module' => 'text',
         'settings' => array(
-          'size' => '60',
+          'size' => '30',
         ),
         'type' => 'text_textfield',
         'weight' => '3',
@@ -271,6 +271,7 @@ function goodhelp_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
+  t('Enter a topic id for this topic. Lower case letters and underscores only.');
   t('Product');
   t('Topic');
   t('Version');
