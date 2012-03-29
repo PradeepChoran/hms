@@ -1,8 +1,10 @@
 <?php
 /**
  * @file
- * Main code for the Good Help Conf module.
+ * Code for the goodhelp_conf feature.
  */
+
+include_once 'goodhelp_conf.features.inc';
 
 /**
  * Implements goodhelp_product_info().
@@ -13,8 +15,9 @@ function goodhelp_conf_goodhelp_product_info() {
       'name' => 'NOC',
       'versions' => array(
         '4.6',
+        '4.6.3',
         '4.7',
-        '4.7.1',
+        '4.7.4',
         '4.8',
         '4.9',
       ),

@@ -34,6 +34,18 @@ function goodhelp_settings_form() {
     );
   }
   
+  // Fallback settings.
+  $form['goodhelp_fallback'] = array(
+    '#type' => 'radios',
+    '#title' => 'Fallback Settings',
+    '#options' => array(
+      0 => t('No Fallback'),
+      2 => t('Fall back to topics within the requested second level version (i.e. 4.7.4 falls back to 4.7.2, 4.7)'),
+      1 => t('Fall back to topics within the requested first level version (i.e. 4.7 falls back to 4.5)'),
+    ),
+    '#default_value' => variable_get('goodhelp_fallback', 2),
+  );
+  
   // Some validation.
   $form['#validate'] = array('goodhelp_settings_validate');
   

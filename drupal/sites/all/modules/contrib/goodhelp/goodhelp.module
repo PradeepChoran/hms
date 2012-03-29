@@ -114,17 +114,72 @@ function goodhelp_tip_load($topic_id, $version = NULL) {
  *
  * @param $id
  *   Machine ID of the required topic.
+ * @param $product
+ *   Product machine name of the topic.
  * @param $version
  *   Version of the topic to collect.
  *
  * @return
- *   Node object.
+ *   Node object, or FALSE if none was found.
  */
 function goodhelp_topic_load($topic_id, $product, $version) {
-  $topic = _goodhelp_find_topic_instance($topic_id, $product, $version);
+  $topics = _goodhelp_find_topic_instance($topic_id, $product);
+  // Select a version from the ones returned.
+  if ($return_version = goodhelp_select_version(array_keys($topics), $version)) {
+    $topic = $topics[$return_version];
+  }
   if (isset($topic->nid)){
     return node_load($topic->nid);
   }
+  return FALSE;
+}
+
+/**
+ * Returns the version that should be used, given the options and target version.
+ *
+ * @param $options
+ *  An array of version numbers. Must be formatted as numbers separated by periods.
+ * @param $target
+ *  A target version to return. If this version is not present, it will return
+ *  an appropriate fallback version.
+ *
+ * @return A version number if found, or FALSE if none was found.
+ */
+function goodhelp_select_version($options, $target) {
+  $fallback_settings = variable_get('goodhelp_fallback', 0);
+  $result = FALSE;
+  // Check for the target version directly.
+  if (in_array($target, $options)) {
+    $result = $target;
+  }
+  else {
+    // If fallback is allowed at all...
+    if ($fallback_settings != 0) {
+      // Look for the closest version available.
+      usort($options, 'version_compare');
+      $version_parts = explode('.', $target);
+      foreach ($options as $option) {
+        $compare = version_compare($option, $target);
+        if ($compare == -1) {
+          switch ($fallback_settings) {
+            case '1':
+              $base = $version_parts[0];
+              break;
+            case '2':
+              $base = $version_parts[0] . '.' . $version_parts[1];
+              break;
+          }
+          if (strpos($option, $base) === 0) {
+            $result = $option;
+          }
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
+  return $result;
 }
 
 /**
@@ -132,11 +187,13 @@ function goodhelp_topic_load($topic_id, $product, $version) {
  *
  * @param $topic_id
  *   Machine ID of the required topic.
+ * @param $topic
+ *   Product name.
  * @param $version
  *   Version of the topic to collect.
  *
  * @return
- *   Topic object.
+ *   An array of node ids matching the search criteria, keyed by version.
  */
 function _goodhelp_find_topic_instance($topic_id, $product, $version) {
   $query = db_select('node', 'n');
@@ -144,14 +201,17 @@ function _goodhelp_find_topic_instance($topic_id, $product, $version) {
   $query->innerJoin('field_data_field_goodhelp_topic_id', 'gti', "gti.entity_id = n.nid AND gti.revision_id = n.vid AND gti.entity_type = 'node'");
   $query->leftJoin('field_data_field_goodhelp_topic_version', 'gtv', "gtv.entity_id = n.nid AND gtv.revision_id = n.vid AND gtv.entity_type = 'node'");
   $query->leftJoin('field_data_field_goodhelp_topic_product', 'gtp', "gtp.entity_id = n.nid AND gtp.revision_id = n.vid AND gtp.entity_type = 'node'");
+  $query->addField('gtv', 'field_goodhelp_topic_version_value', 'version');
   $query
     ->condition('n.status', 1, '=')
     ->condition('gti.field_goodhelp_topic_id_value', $topic_id, '=')
-    ->condition('gtp.field_goodhelp_topic_product_value', $product, '=')
-    ->condition('gtv.field_goodhelp_topic_version_value', $version, '=')
-    ->range(0, 1);
-
-  return $query->execute()->fetchObject();
+    ->condition('gtp.field_goodhelp_topic_product_value', $product, '=');
+  // Add in a version condition if present.
+  if (isset($version)) {
+    $query->condition('gtv.field_goodhelp_topic_version_value', $version, '=');
+  }
+  // Return all the topics found, keyed by version.
+  return $query->execute()->fetchAllAssoc('version');
 }
 
 /**
