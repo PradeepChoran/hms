@@ -6,6 +6,26 @@
 include_once('goodhelp_structure.features.inc');
 
 /**
+ * 
+ */
+function goodhelp_structure_menu() {
+  $items = array();
+  
+  $items['node/add/goodhelp-topic/new'] = array(
+    'type' => MENU_LOCAL_ACTION,
+    'access callback' => TRUE,
+    'title' => 'Add New Book',
+    'tab_root' => 'help-books',
+    'tab_parent' => 'help-books',
+    'options' => array(
+      'attributes' => array('class' => 'test'),
+    ),
+  );
+  
+  return $items;
+}
+
+/**
  * Implements hook_field_form_FORM_ID_alter().
  */
 function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
@@ -21,8 +41,23 @@ function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_s
   $book['weight']['#access'] = FALSE; 
   
   $form['title']['#description'] = t('Enter a human readable title for this page, which will appear at the top of the help page.');
+
+  // Make sure we know if we are creating a new book, even on AJAX rebuilds.
+  $type = arg(3);
+  if (!empty($type)) {
+    $type = arg(3);
+    $form['goodhelp_structure_type'] = array(
+      '#type' => 'value',
+      '#value' => $type,
+    );
+  }
+  elseif (isset($form_state['complete form']['goodhelp_structure_type']['#value'])) {
+    $type = $form_state['complete form']['goodhelp_structure_type']['#value'];
+  }
+
   // If the parent is preset, we are creating a child page. Simplify things.
-  if ($parent = $_GET['parent']) {
+  if (isset($_GET['parent'])) {
+    $parent = $_GET['parent'];
     $book['#collapsible'] = TRUE;
     $book['#disabled'] = TRUE;
     // Preset the product and version info.
@@ -36,9 +71,34 @@ function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_s
       $form['field_goodhelp_topic_version']['und']['#options'] = drupal_map_assoc(array($version));
       $form['field_goodhelp_topic_version']['und']['#default_value'] = $version;
     }
-  } 
+  }
+  elseif (isset($type)) {
+    switch ($type) {
+      case 'new':
+        // Simplify the form for creation of new book. 
+        drupal_set_title(t('New Help Book'));
+        $book['bid']['#default_value'] = 'new';
+        hide($book);
+        unset($form['title']);
+        unset($form['field_goodhelp_topic_id']);
+        array_unshift($form['#validate'], 'goodhelp_structure_new_book_validate');
+        break;
+    }
+ }
   // Add a validation function.
   $form['#validate'][] = 'goodhelp_structure_validate_structure';
+}
+
+/**
+ * Validation callback for new book creation.
+ */
+function goodhelp_structure_new_book_validate($form, &$form_state) {
+  // Automatically create the title for the new book.
+  $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
+  $product_name = $form['field_goodhelp_topic_product']['und']['#options'][$product];
+  $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
+  $form_state['values']['title'] = "$product_name $version";
+  $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'] = "$product$version";
 }
 
 /**
