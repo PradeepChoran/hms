@@ -68,13 +68,11 @@ function goodhelp_node_validate($node, $form, &$form_state) {
   $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
   $topic = _goodhelp_find_topic_instance($topic_id, $product, $version);
 
-  if (!empty($topic) && $version == $topic->version_id) {
-    if ($topic->nid != $node->nid){
-      form_set_error('field_goodhelp_topic_version', t('There is !already a page for this topic and version.', array(
-          '!already' => l(t('already'), 'node/' . $topic->nid),
-        ))
-      );
-    }
+  if (!empty($topic)) {
+    form_set_error('field_goodhelp_topic_version', t('There is !already a page for this topic and version.', array(
+        '!already' => l(t('already'), 'node/' . $topic[$version]->nid),
+      ))
+    );
   }
 }
 
