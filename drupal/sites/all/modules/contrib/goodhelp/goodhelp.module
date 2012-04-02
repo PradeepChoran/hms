@@ -21,6 +21,7 @@ function goodhelp_menu() {
     'access arguments' => array('access administration pages'),
   );
 
+  // Goodhelp preview page.
   $items['goodhelp/preview'] = array(
     'title' => 'Goodhelp Preview',
     'page callback' => 'drupal_get_form',
@@ -54,38 +55,17 @@ function goodhelp_node_validate($node, $form, &$form_state) {
     return;
   }
 
-  // Check if the submitted help topic + product + version is unique.
+  // Check if the submitted help topic + product + version combo is unique.
   $topic_id = $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'];
   $product = $form_state['values']['field_goodhelp_topic_product']['und'][0]['value'];
   $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
   $topic = _goodhelp_find_topic_instance($topic_id, $product, $version);
 
   if (!empty($topic)) {
-    form_set_error('field_goodhelp_topic_version', t('There is !already a page for this topic and version.', array(
-        '!already' => l(t('already'), 'node/' . $topic[$version]->nid),
-      ))
-    );
+    $node_link = l(t('already'), 'node/' . $topic[$version]->nid);
+    $error = t('There is !already a page for this topic and version.', array('!already' => $node_link));
+    form_set_error('field_goodhelp_topic_version', $error);
   }
-}
-
-/**
- * Load the short help tip for the specified topic.
- *
- * @param $id
- *   Machine ID of the required topic.
- * @param $version
- *   Version of the topic to collect.
- *
- * @return
- *   String of the prepared help text.
- */
-function goodhelp_tip_load($topic_id, $version = NULL) {
-  $node = goodhelp_topic_load($topic_id, $version);
-  if (isset($node->nid)) {
-    $teaser = node_view($node, 'teaser');
-    return $teaser['body'][0]['#markup'];
-  }
-  return '';
 }
 
 /**
@@ -115,6 +95,7 @@ function goodhelp_topic_load($topic_id, $product, $version) {
 
 /**
  * Returns the version that should be used, given the options and target version.
+ * Takes into account the fallback settings.
  *
  * @param $options
  *  An array of version numbers. Must be formatted as numbers separated by periods.
@@ -185,36 +166,21 @@ function _goodhelp_find_topic_instance($topic_id, $product, $version = NULL) {
     ->condition('n.status', 1, '=')
     ->condition('gti.field_goodhelp_topic_id_value', $topic_id, '=')
     ->condition('gtp.field_goodhelp_topic_product_value', $product, '=');
-  // Add in a version condition if present.
+
+  // Add in a version condition if version is specified.
   if (isset($version)) {
     $query->condition('gtv.field_goodhelp_topic_version_value', $version, '=');
   }
+
   // Return all the topics found, keyed by version.
   return $query->execute()->fetchAllAssoc('version');
 }
 
 /**
- * Identify the Node ID of the selected topic.
- *
- * @param $topic_id
- *   Machine ID of the required topic.
- * @param $version
- *   Version of the topic to collect.
- *
- * @return
- *   Topic object converted to string.
- */
-function goodhelp_topic_tostring($topic_id, $product, $version) {
-  return print_r(_goodhelp_find_topic_instance($topic_id, $version), TRUE);
-}
-
-/**
- * Implements hook_services_resource_alter.
- *
- * Add topic resource action and lookups to the service.
+ * Implements hook_services_resource_alter().
  */
 function goodhelp_services_resources_alter(&$resources, $endpoint) {
-  // Retrieve the teaser or body of a given topic & version
+  // Add topic resource.
   // [POST] {endpoint}/topic/{topicname}/product/{productname}/version/{version}/{tip|manual|guide}
   $resources['topic']['relationships']['product'] = array(
     'help' => 'Retrieve the teaser or body of a given topic, product, and version',
@@ -256,7 +222,7 @@ function goodhelp_services_resources_alter(&$resources, $endpoint) {
 }
 
 /**
- * Services callback for retrieving topic node details
+ * Services callback for retrieving topic node details.
  */
 function _goodhelp_services_retrieve($topic, $product, $version, $size = 'manual') {
   $node = goodhelp_topic_load($topic, $product, $version);
@@ -308,17 +274,18 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
       drupal_set_message(t('The maximum number of versions is already being supported for this product, so you may only add pages for one of those versions. To start help for a new version, you must first remove support for an earlier version.'), 'warning');
     }
     else {
-      $options = goodhelp_version_options(NULL, $product);
+      $options = goodhelp_version_options($product);
     }
     $form['field_goodhelp_topic_version']['und']['#options'] = $options;
   }
-  else if (arg(2) == 'edit') {
+  elseif (arg(2) == 'edit') {
     // Set the options for the versions field.
     $product = $form['field_goodhelp_topic_product']['und']['#default_value'][0];
-    $options = goodhelp_version_options(NULL, $product);
+    $options = goodhelp_version_options($product);
     $form['field_goodhelp_topic_version']['und']['#options'] = $options;
   }
   else {
+    // Set to disabled. Product needs to be selected first.
     $form['field_goodhelp_topic_version']['und']['#options'] = array('- Select a value -');
     $form['field_goodhelp_topic_version']['und']['#disabled'] = TRUE;
   }
@@ -346,16 +313,14 @@ function goodhelp_product_options() {
 }
 
 /**
- * Allowed values callback for the goodhelp_topic_version field.
+ * Returns the versions available for a given product.
  * 
- * @param $field_info
- *  Specified by the field module when it calls this function.
  * @param $product
- *  A product name to return the versions for.
+ *  A product machine name to return the versions for.
  */
-function goodhelp_version_options($field_info = NULL, $product = NULL) {
+function goodhelp_version_options($product) {
   $versions = array();
-  if ($product) {
+  if (isset($product)) {
     $products = goodhelp_get_product_info();
     if (isset($products[$product])) {
       $versions = $products[$product]['versions'];
@@ -365,14 +330,56 @@ function goodhelp_version_options($field_info = NULL, $product = NULL) {
 }
 
 /**
- * Returns all user-defined products.
+ * Get basic information about all products.
+ *
+ * @param $product
+ *   A product machine name.
+ *
+ * @return An associative array, keyed by product machine name, containing
+ * information about all products.
+ *
+ * @see goodhelp.api.php
  */
 function goodhelp_get_product_info() {
   return module_invoke_all('goodhelp_product_info');
 }
 
 /**
- * Returns TRUE if the product has hit the maximum supported versions, FALSE otherwise.
+ * Returns a list of the versions currently supported for the given product. A
+ * version is considered supported if there are any topics for it.
+ *
+ * @param $product
+ *   A product machine name.
+ */
+function goodhelp_get_supported_versions($product) {
+  $query = db_select('field_revision_field_goodhelp_topic_version', 'version');
+  $query->addField('version', 'field_goodhelp_topic_version_value', 'value');
+  $query->leftJoin('field_revision_field_goodhelp_topic_product', 'product', "version.entity_id = product.entity_id");
+  $query->condition('product.field_goodhelp_topic_product_value', $product, '=');
+  $query->distinct();
+  $result = $query->execute()->fetchCol();
+  return drupal_map_assoc($result);
+}
+
+/**
+ * Returns an array of all the possible version names. This serves as the allowed 
+ * values callback for the goodhelp_topic_version field.
+ *
+ * @param $field_info
+ *   Specified by the field module when it calls this function.
+ */
+function goodhelp_get_all_versions($field_info = NULL) {
+  $versions = array();
+  $info = goodhelp_get_product_info();
+  foreach ($info as $product) {
+    $versions += drupal_map_assoc($product['versions']);
+  }
+  return $versions;
+}
+
+/**
+ * Returns TRUE if the product's number currently supported versions equals
+ * the the maximum allowed supported versions for that product, otherwise FALSE.
  */
 function goodhelp_hit_max($product) {
   $max = goodhelp_max_versions($product);
@@ -384,7 +391,12 @@ function goodhelp_hit_max($product) {
 }
 
 /**
- * Get the max supported versions for a product.
+ * Returns the maximum allowed supported versions for a product.
+ *
+ * @param $product
+ *   A product machine name.
+ *
+ * @return The number of allowed versions, or 0 if not set.
  */
 function goodhelp_max_versions($product) {
   $maxes = variable_get('goodhelp_max_versions', array());
@@ -392,30 +404,4 @@ function goodhelp_max_versions($product) {
     return $maxes[$product];
   }
   return 0;
-}
-
-/**
- * Returns a list of the versions currently supported for the given product.
- */
-function goodhelp_get_supported_versions($product) {
-  $query = db_select('field_revision_field_goodhelp_topic_version', 'ver');
-  $query->addField('ver', 'field_goodhelp_topic_version_value', 'value');
-  $query->leftJoin('field_revision_field_goodhelp_topic_product', 'prod', "ver.entity_id = prod.entity_id");
-  $query->condition('prod.field_goodhelp_topic_product_value', $product, '=');
-  $query->distinct();
-  $result = $query->execute()->fetchCol();
-  return drupal_map_assoc($result);
-}
-
-/**
- * Returns an array of all the possible version names. This serves as the allowed 
- * values callback for the version field.
- */
-function goodhelp_get_all_versions() {
-  $versions = array();
-  $info = goodhelp_get_product_info();
-  foreach($info as $product) {
-    $versions += drupal_map_assoc($product['versions']);
-  }
-  return $versions;
 }
