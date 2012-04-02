@@ -6,11 +6,12 @@
 include_once('goodhelp_structure.features.inc');
 
 /**
- * 
+ * Implements hook_menu().
  */
 function goodhelp_structure_menu() {
   $items = array();
   
+  // Add a menu callback for creating new books.
   $items['node/add/goodhelp-topic/new'] = array(
     'type' => MENU_LOCAL_ACTION,
     'access callback' => TRUE,
@@ -26,17 +27,18 @@ function goodhelp_structure_menu() {
 }
 
 /**
- * Implements hook_field_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
 function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
-  // Make some changes to the book fieldset.
-  $book = &$form['book'];
   // Take the book fieldset out of the 'additional settings' vertical tabs group.
+  $book = &$form['book'];
   unset($book['#group']);
+
   // Change some other settings.
   $book['#weight'] = -50;
   $book['#collapsible'] = FALSE;
   $book['#collapsed'] = FALSE;
+
   // Remove weight just to simplify things. Can be changed via book UI.
   $book['weight']['#access'] = FALSE; 
   
