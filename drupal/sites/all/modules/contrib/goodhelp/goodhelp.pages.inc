@@ -71,3 +71,56 @@ function goodhelp_settings_validate($form, &$form_state) {
     }
   } 
 }
+
+/**
+ * Page callback for Goodhelp Preview.
+ */
+function goodhelp_preview_page() {
+  $form = array();
+  $form['#method'] = 'GET';
+  
+  // Display the form to select parameters.
+  $form['goodhelp_preview_form'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Parameters',
+  );
+  $form['goodhelp_preview_form']['topic'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Topic ID',
+    '#size' => 20,
+    '#default_value' => isset($_GET['topic']) ?  $_GET['topic'] : '',
+  );
+  $form['goodhelp_preview_form']['product'] = array(
+    '#type' => 'select',
+    '#title' => 'Product',
+    '#options' => goodhelp_product_options(),
+    '#default_value' => isset($_GET['product']) ? $_GET['product'] : '',
+  );
+  $form['goodhelp_preview_form']['version'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Version',
+    '#size' => 20,
+    '#default_value' => isset($_GET['version']) ? $_GET['version'] : '',
+  );
+  $form['goodhelp_preview_form']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Preview',
+  );
+  
+  // Show a preview.
+  $form['goodhelp_preview'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Preview',
+  );
+  $form['goodhelp_preview']['preview'] = array(
+    '#markup' => 'Select parameters.',
+  );
+  if (!empty($_GET['topic']) && !empty($_GET['product']) && !empty($_GET['version'])) {
+    $node = goodhelp_topic_load($_GET['topic'], $_GET['product'], $_GET['version']);
+    if (isset($node->nid)) {
+      $form['goodhelp_preview']['preview']['#markup'] = drupal_render(node_view($node, 'full'));
+    }
+  }
+  
+  return $form;
+}

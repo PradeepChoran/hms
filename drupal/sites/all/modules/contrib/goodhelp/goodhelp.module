@@ -21,23 +21,15 @@ function goodhelp_menu() {
     'access arguments' => array('access administration pages'),
   );
 
-  $default = array(
-    'page callback' => '_goodhelp_topic_page',
-    'access arguments' => array('goodhelp topic review'),
+  $items['goodhelp/preview'] = array(
+    'title' => 'Goodhelp Preview',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('goodhelp_preview_page'),
+    'file' => 'goodhelp.pages.inc',
+    'access arguments' => array('use goodhelp preview'),
+    'menu_name' => 'main-menu',
+    'weight' => 10,
   );
-
-  $items['goodhelp/topic/%'] = array(
-    'title' => 'Help for "@topic"',
-    'title arguments' => array('@topic' => 2),
-    'page arguments' => array(2),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  ) + $default;
-  $items['goodhelp/topic/%/%'] = array(
-    'title' => 'Help topic for "@topic" on version "@version"',
-    'title arguments' => array('@topic' => 2, '@version' => 3),
-    'page arguments' => array(2, 3),
-    'type' => MENU_LOCAL_TASK,
-  ) + $default;
 
   return $items;
 }
@@ -47,9 +39,9 @@ function goodhelp_menu() {
  */
 function goodhelp_permission() {
   return array(
-    'goodhelp topic review' => array(
-      'title' => t('Review Help Topic'),
-      'description' => t('Double check how help topics will appear to users for a given version of the topic.'),
+    'use goodhelp preview' => array(
+      'title' => t('use goodhelp preview'),
+      'description' => t('Double check how help topics will appear to users for a given product version.'),
     ),
   );
 }
@@ -74,17 +66,6 @@ function goodhelp_node_validate($node, $form, &$form_state) {
       ))
     );
   }
-}
-
-/**
- * Build a page out of the routed help request.
- */
-function _goodhelp_topic_page($topic_id, $version = NULL) {
-  $node = goodhelp_topic_load($topic_id, $version);
-  if (isset($node->nid)){
-    return node_view($node);
-  }
-  return '';
 }
 
 /**
@@ -193,7 +174,7 @@ function goodhelp_select_version($options, $target) {
  * @return
  *   An array of node ids matching the search criteria, keyed by version.
  */
-function _goodhelp_find_topic_instance($topic_id, $product, $version) {
+function _goodhelp_find_topic_instance($topic_id, $product, $version = NULL) {
   $query = db_select('node', 'n');
   $query->addField('n', 'nid');
   $query->innerJoin('field_data_field_goodhelp_topic_id', 'gti', "gti.entity_id = n.nid AND gti.revision_id = n.vid AND gti.entity_type = 'node'");
