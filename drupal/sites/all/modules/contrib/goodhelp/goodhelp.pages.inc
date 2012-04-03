@@ -113,12 +113,15 @@ function goodhelp_preview_page() {
     '#title' => 'Preview',
   );
   $form['goodhelp_preview']['preview'] = array(
-    '#markup' => 'Select parameters.',
+    '#markup' => t('Select parameters.'),
   );
   if (!empty($_GET['topic']) && !empty($_GET['product']) && !empty($_GET['version'])) {
     $node = goodhelp_topic_load($_GET['topic'], $_GET['product'], $_GET['version']);
     if (isset($node->nid)) {
       $form['goodhelp_preview']['preview']['#markup'] = drupal_render(node_view($node, 'full'));
+    }
+    else {
+      $form['goodhelp_preview']['preview']['#markup'] = '<strong>' . t('No topic found.') . '</strong>';
     }
   }
   
