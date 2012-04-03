@@ -100,7 +100,7 @@ function goodhelp_structure_new_book_validate($form, &$form_state) {
   $product_name = $form['field_goodhelp_topic_product']['und']['#options'][$product];
   $version = $form_state['values']['field_goodhelp_topic_version']['und'][0]['value'];
   $form_state['values']['title'] = "$product_name $version";
-  $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'] = "$product$version";
+  $form_state['values']['field_goodhelp_topic_id']['und'][0]['value'] = "$product";
 }
 
 /**
