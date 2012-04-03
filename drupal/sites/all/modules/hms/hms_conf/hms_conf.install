@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * Install file for the HMS Conf module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function hms_conf_install() {
+  // Disable core block module.
+  module_disable(array('block'));
+}
