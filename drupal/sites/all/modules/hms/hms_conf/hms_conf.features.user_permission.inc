@@ -117,6 +117,15 @@ function hms_conf_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: use goodhelp preview
+  $permissions['use goodhelp preview'] = array(
+    'name' => 'use goodhelp preview',
+    'roles' => array(
+      0 => 'editor',
+    ),
+    'module' => 'goodhelp',
+  );
+
   // Exported permission: view own unpublished content
   $permissions['view own unpublished content'] = array(
     'name' => 'view own unpublished content',
