@@ -23,7 +23,6 @@ function goodhelp_conf_strongarm() {
   $strongarm->name = 'goodhelp_max_versions';
   $strongarm->value = array(
     'noc' => '4',
-    'other_product' => '0',
   );
   $export['goodhelp_max_versions'] = $strongarm;
 

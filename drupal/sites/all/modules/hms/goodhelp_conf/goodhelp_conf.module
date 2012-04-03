@@ -14,21 +14,10 @@ function goodhelp_conf_goodhelp_product_info() {
     'noc' => array(
       'name' => 'NOC',
       'versions' => array(
-        '4.6',
-        '4.6.3',
         '4.7',
-        '4.7.4',
         '4.8',
         '4.9',
-      ),
-    ),
-    'other_product' => array(
-      'name' => 'Other Product',
-      'versions' => array(
-        '1',
-        '2',
-        '3',
-        '4',
+        '4.10',
       ),
     ),
   );
