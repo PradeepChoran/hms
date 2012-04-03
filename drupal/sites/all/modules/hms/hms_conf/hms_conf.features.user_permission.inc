@@ -108,15 +108,6 @@ function hms_conf_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: goodhelp topic review
-  $permissions['goodhelp topic review'] = array(
-    'name' => 'goodhelp topic review',
-    'roles' => array(
-      0 => 'editor',
-    ),
-    'module' => 'goodhelp',
-  );
-
   // Exported permission: revert revisions
   $permissions['revert revisions'] = array(
     'name' => 'revert revisions',
