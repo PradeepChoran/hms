@@ -179,7 +179,7 @@ function goodhelp_structure_views_default_views() {
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['ui_name'] = 'Manage Link';
   $handler->display->display_options['fields']['nothing']['label'] = 'Edit';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'edit order and titles';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'Edit book outline';
   $handler->display->display_options['fields']['nothing']['alter']['make_link'] = 1;
   $handler->display->display_options['fields']['nothing']['alter']['path'] = 'admin/content/book/[nid]';
   $handler->display->display_options['fields']['nothing']['alter']['absolute'] = 0;
