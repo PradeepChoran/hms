@@ -10,6 +10,12 @@
 function hms_conf_user_default_roles() {
   $roles = array();
 
+  // Exported role: client site
+  $roles['client site'] = array(
+    'name' => 'client site',
+    'weight' => '3',
+  );
+
   // Exported role: editor
   $roles['editor'] = array(
     'name' => 'editor',
