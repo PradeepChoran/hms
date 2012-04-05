@@ -295,7 +295,7 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
   
   // Add a dropdown to help choose a topic id.
   $topic_id_suggestions = goodhelp_get_topic_id_options();
-  if (!empty($topic_id_suggestions)) {
+  if (!empty($topic_id_suggestions) && isset($form['field_goodhelp_topic_id'])) {
     $form['field_goodhelp_topic_id']['#prefix'] = '<div id="goodhelp-topic-ajax-wrapper">';
     $form['field_goodhelp_topic_id']['#suffix'] = '</div>';
     $form['goodhelp_topic_id_select'] = array(

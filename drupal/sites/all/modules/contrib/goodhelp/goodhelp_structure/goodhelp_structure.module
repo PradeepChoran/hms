@@ -83,6 +83,9 @@ function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_s
         hide($book);
         unset($form['title']);
         unset($form['field_goodhelp_topic_id']);
+        if (isset($form['goodhelp_topic_id_select'])) {
+          unset($form['goodhelp_topic_id_select']);
+        }
         array_unshift($form['#validate'], 'goodhelp_structure_new_book_validate');
         break;
     }
