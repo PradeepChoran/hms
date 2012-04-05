@@ -291,6 +291,31 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
     // Set to disabled. Product needs to be selected first.
     $form['field_goodhelp_topic_version']['und']['#options'] = array('- Select a value -');
     $form['field_goodhelp_topic_version']['und']['#disabled'] = TRUE;
+  } 
+  
+  // Add a dropdown to help choose a topic id.
+  $topic_id_suggestions = goodhelp_get_topic_id_options();
+  if (!empty($topic_id_suggestions)) {
+    $form['field_goodhelp_topic_id']['#prefix'] = '<div id="goodhelp-topic-ajax-wrapper">';
+    $form['field_goodhelp_topic_id']['#suffix'] = '</div>';
+    $form['goodhelp_topic_id_select'] = array(
+      '#type' => 'select',
+      '#title' => 'Topic Suggestions',
+      '#options' => goodhelp_get_topic_id_options(),
+      '#weight' => $form['field_goodhelp_topic_id']['#weight'] - 0.5,
+      '#description' => t('Choose a topic from this list, or enter a custom one below.'),
+      '#ajax' => array(
+        'wrapper' => 'goodhelp-topic-ajax-wrapper',
+        'callback' => 'goodhelp_topic_id_fill_ajax',
+      ),
+    );
+
+    // If there's a topic selected in the dropdown, fill the textfield.
+    if (isset($form_state['values']['goodhelp_topic_id_select'])) {
+      if ($form_state['values']['goodhelp_topic_id_select'] != '_none') {
+        $form['field_goodhelp_topic_id']['und'][0]['value']['#value'] = $form_state['values']['goodhelp_topic_id_select'];
+      }
+    }
   }
 }
 
@@ -299,6 +324,21 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
  */
 function goodhelp_version_ajax_callback($form, &$form_state) {
   return $form['field_goodhelp_topic_version'];
+}
+
+/**
+ * Ajax callback for the Topic ID suggestion field.
+ */
+function goodhelp_topic_id_fill_ajax($form, &$form_state) {
+  return $form['field_goodhelp_topic_id'];
+}
+
+/**
+ * Returns a list of topic ID suggestions from other modules.
+ */
+function goodhelp_get_topic_id_options() {
+  $none = array('_none' => '- Select one -');
+  return $none + drupal_map_assoc(module_invoke_all('goodhelp_topic_id_options'));
 }
 
 /**

@@ -22,3 +22,14 @@ function goodhelp_conf_goodhelp_product_info() {
     ),
   );
 }
+
+/**
+ * Implements goodhelp_topic_id_options().
+ */
+function goodhelp_conf_goodhelp_topic_id_options() {
+  return array(
+    'noc_directory',
+    'noc_blog',
+    'noc_forum',
+  );
+}
