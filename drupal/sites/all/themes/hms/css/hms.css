@@ -1,0 +1,4 @@
+/* Remove the margin from the top of the page */
+#main {
+  margin-top: 0;
+}
