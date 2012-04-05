@@ -97,56 +97,7 @@ function goodhelp_topic_load($topic_id, $product, $version) {
 }
 
 /**
- * Returns the version that should be used, given the options and target version.
- * Takes into account the fallback settings.
- *
- * @param $options
- *  An array of version numbers. Must be formatted as numbers separated by periods.
- * @param $target
- *  A target version to return. If this version is not present, it will return
- *  an appropriate fallback version.
- *
- * @return A version number if found, or FALSE if none was found.
- */
-function goodhelp_select_version($options, $target) {
-  $fallback_settings = variable_get('goodhelp_fallback', 0);
-  $result = FALSE;
-  // Check for the target version directly.
-  if (in_array($target, $options)) {
-    $result = $target;
-  }
-  else {
-    // If fallback is allowed at all...
-    if ($fallback_settings != 0) {
-      // Look for the closest version available.
-      usort($options, 'version_compare');
-      $version_parts = explode('.', $target);
-      foreach ($options as $option) {
-        $compare = version_compare($option, $target);
-        if ($compare == -1) {
-          switch ($fallback_settings) {
-            case '1':
-              $base = $version_parts[0];
-              break;
-            case '2':
-              $base = $version_parts[0] . '.' . $version_parts[1];
-              break;
-          }
-          if (strpos($option, $base) === 0) {
-            $result = $option;
-          }
-        }
-        else {
-          break;
-        }
-      }
-    }
-  }
-  return $result;
-}
-
-/**
- * Identify the Node ID of the selected topic.
+ * Find topics that match a certain topic id, product, and (optionally) version.
  *
  * @param $topic_id
  *   Machine ID of the required topic.
@@ -177,6 +128,55 @@ function _goodhelp_find_topic_instance($topic_id, $product, $version = NULL) {
 
   // Return all the topics found, keyed by version.
   return $query->execute()->fetchAllAssoc('version');
+}
+
+/**
+ * Returns the version that should be used, given the options and target version.
+ * Takes into account the fallback settings.
+ *
+ * @param $options
+ *  An array of version numbers. Must be formatted as numbers separated by periods.
+ * @param $target
+ *  A target version to return. If this version is not present, it will return
+ *  an appropriate fallback version.
+ *
+ * @return A version number if found, or FALSE if none was found.
+ */
+function goodhelp_select_version($options, $target) {
+  $result = FALSE;
+  // Check for the target version directly.
+  if (in_array($target, $options)) {
+    $result = $target;
+  }
+  else {
+    // If fallback is allowed at all...
+    $fallback_settings = variable_get('goodhelp_fallback', 0);
+    if ($fallback_settings != 0) {
+      // Look for the closest version available.
+      usort($options, 'version_compare');
+      $version_parts = explode('.', $target);
+      foreach ($options as $option) {
+        $compare = version_compare($option, $target);
+        if ($compare == -1) {
+          switch ($fallback_settings) {
+            case '1':
+              $base = $version_parts[0];
+              break;
+            case '2':
+              $base = $version_parts[0] . '.' . $version_parts[1];
+              break;
+          }
+          if (strpos($option, $base) === 0) {
+            $result = $option;
+          }
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
+  return $result;
 }
 
 /**
