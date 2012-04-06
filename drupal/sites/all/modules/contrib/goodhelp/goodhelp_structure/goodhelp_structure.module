@@ -22,8 +22,50 @@ function goodhelp_structure_menu() {
       'attributes' => array('class' => 'test'),
     ),
   );
-  
+
+  // Manual page.
+  $items['goodhelp/manual'] = array(
+    'title' => 'Manual router',
+    'page callback' => 'goodhelp_structure_manual_router',
+    'access arguments' => array('view the goodhelp manual'),
+  );
+
   return $items;
+}
+
+/**
+ * Page callback for the manual menu item. Sends the user to the appropriate
+ * topic page.
+ */
+function goodhelp_structure_manual_router() {
+  if (isset($_GET['product']) && isset($_GET['version'])) {
+    if (isset($_GET['topic'])) {
+      $node = goodhelp_topic_load($_GET['topic'], $_GET['product'], $_GET['version']);
+      if ($node) {
+        $nid = $node->nid;
+      }
+    }
+    else {
+      $nid = goodhelp_structure_find_book($_GET['product'], $_GET['version']);
+    }
+  }
+  if (isset($nid) && $nid) {
+    drupal_goto('node/' . $nid);
+  }
+  else {
+    drupal_not_found();    
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function goodhelp_structure_permission() {
+  return array(
+    'view the goodhelp manual' => array(
+      'title' => t('View the Goodhelp manual'),
+    ),
+  );
 }
 
 /**
@@ -152,6 +194,27 @@ function goodhelp_structure_get_bid($mlid) {
   $query->condition('book.mlid', $mlid, '=');
   if ($bid = $query->execute()->fetchField()) {
     return $bid;
+  }
+  return FALSE;
+}
+
+/**
+ *
+ */
+function goodhelp_structure_find_book($product, $version) {
+  $query = db_select('book');
+  $query->addField('book', 'bid');
+  $query->leftJoin('field_data_field_goodhelp_topic_version', 'version', "version.entity_id = book.bid");
+  $query->leftJoin('field_data_field_goodhelp_topic_product', 'prod', "prod.entity_id = book.bid");
+  $query
+    ->condition('prod.field_goodhelp_topic_product_value', $product, '=')
+    ->condition('version.field_goodhelp_topic_version_value', $version, '=');
+  $query->distinct();
+  
+  // 
+  $results = $query->execute()->fetchCol();
+  if (!empty($results)) {
+    return array_pop($results);
   }
   return FALSE;
 }
