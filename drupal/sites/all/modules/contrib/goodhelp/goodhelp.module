@@ -253,6 +253,7 @@ function _goodhelp_services_retrieve($topic, $product, $version, $size = 'manual
       'size' => $size,
       'title' => $node->title,
       'message' => $message,
+      'nid' => $node->nid,
     ),
   );
 }
