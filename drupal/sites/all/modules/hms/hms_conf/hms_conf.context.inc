@@ -35,6 +35,12 @@ function hms_conf_context_default_contexts() {
           'region' => 'sidebar_first',
           'weight' => '-10',
         ),
+        'views-topic_search-block' => array(
+          'module' => 'views',
+          'delta' => 'topic_search-block',
+          'region' => 'sidebar_second',
+          'weight' => '-10',
+        ),
       ),
     ),
   );

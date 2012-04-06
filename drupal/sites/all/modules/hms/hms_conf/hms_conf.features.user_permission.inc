@@ -34,6 +34,7 @@ function hms_conf_user_default_permissions() {
   $permissions['access printer-friendly version'] = array(
     'name' => 'access printer-friendly version',
     'roles' => array(),
+    'module' => 'book',
   );
 
   // Exported permission: add content to books
