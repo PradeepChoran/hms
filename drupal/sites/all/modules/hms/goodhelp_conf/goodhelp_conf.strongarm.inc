@@ -14,7 +14,7 @@ function goodhelp_conf_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'goodhelp_fallback';
-  $strongarm->value = '2';
+  $strongarm->value = '1';
   $export['goodhelp_fallback'] = $strongarm;
 
   $strongarm = new stdClass();
