@@ -1,0 +1,10 @@
+/*** Active Patches ***/
+
+This file will contain information about currently active patches in the HMS
+until it is fully converted into a distribution and the patch information is
+in the drush make file.
+
+== Views ==
+
+- Feature: Default argument for "book root of current node"
+  - http://drupal.org/node/1524600#comment-5848460
