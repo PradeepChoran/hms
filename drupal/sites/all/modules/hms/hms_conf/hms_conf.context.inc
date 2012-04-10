@@ -50,6 +50,27 @@ function hms_conf_context_default_contexts() {
   $context = new stdClass();
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
+  $context->name = 'client_site';
+  $context->description = '';
+  $context->tag = '';
+  $context->conditions = array(
+    'user' => array(
+      'values' => array(
+        'client site' => 'client site',
+      ),
+    ),
+  );
+  $context->reactions = array(
+    'theme_html' => array(
+      'class' => 'client-site',
+    ),
+  );
+  $context->condition_mode = 0;
+  $export['client_site'] = $context;
+
+  $context = new stdClass();
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->api_version = 3;
   $context->name = 'sitewide';
   $context->description = '';
   $context->tag = '';
