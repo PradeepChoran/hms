@@ -14,9 +14,7 @@ function hms_conf_user_default_permissions() {
   $permissions['access content'] = array(
     'name' => 'access content',
     'roles' => array(
-      0 => 'anonymous user',
-      1 => 'authenticated user',
-      2 => 'editor',
+      0 => 'editor',
     ),
     'module' => 'node',
   );
@@ -35,6 +33,15 @@ function hms_conf_user_default_permissions() {
     'name' => 'access printer-friendly version',
     'roles' => array(),
     'module' => 'book',
+  );
+
+  // Exported permission: access toolbar
+  $permissions['access toolbar'] = array(
+    'name' => 'access toolbar',
+    'roles' => array(
+      0 => 'editor',
+    ),
+    'module' => 'toolbar',
   );
 
   // Exported permission: add content to books
@@ -91,6 +98,13 @@ function hms_conf_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: delete revisions
+  $permissions['delete revisions'] = array(
+    'name' => 'delete revisions',
+    'roles' => array(),
+    'module' => 'node',
+  );
+
   // Exported permission: edit any goodhelp_topic content
   $permissions['edit any goodhelp_topic content'] = array(
     'name' => 'edit any goodhelp_topic content',
@@ -143,6 +157,17 @@ function hms_conf_user_default_permissions() {
       0 => 'editor',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: view the goodhelp manual
+  $permissions['view the goodhelp manual'] = array(
+    'name' => 'view the goodhelp manual',
+    'roles' => array(
+      0 => 'authenticated user',
+      1 => 'client site',
+      2 => 'editor',
+    ),
+    'module' => 'goodhelp_structure',
   );
 
   return $permissions;
