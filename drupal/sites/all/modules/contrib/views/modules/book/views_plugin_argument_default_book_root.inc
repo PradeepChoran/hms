@@ -7,18 +7,13 @@
 /**
  * Default argument plugin to get the current node's book root.
  */
-class views_plugin_argument_default_book_root extends views_plugin_argument_default {
+class views_plugin_argument_default_book_root extends views_plugin_argument_default_node {
   function get_argument() {
-    foreach (range(1, 3) as $i) {
-      $node = menu_get_object('node', $i);
-      if (!empty($node) && isset($node->book['bid'])) {
-        return $node->book['bid'];
-      }
-    }
-
-    if (arg(0) == 'node' && is_numeric(arg(1))) {
-      $node = node_load(arg(1));
-      if (!empty($node) && isset($node->book['bid'])) {
+    // Use the argument_default_node plugin to get the nid argument.
+    $nid = parent::get_argument();
+    if (!empty($nid)) {
+      $node = node_load($nid);
+      if (isset($node->book['bid'])) {
         return $node->book['bid'];
       }
     }

@@ -7,4 +7,4 @@ in the drush make file.
 == Views ==
 
 - Feature: Default argument for "book root of current node"
-  - http://drupal.org/node/1524600#comment-5848460
+  - http://drupal.org/node/1524600#comment-5851868
