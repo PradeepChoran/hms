@@ -1,4 +1,4 @@
 /* Remove the margin from the top of the page */
-#main {
+body.client-site #main {
   margin-top: 0;
 }
