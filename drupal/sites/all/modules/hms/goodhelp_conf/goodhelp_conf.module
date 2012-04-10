@@ -33,3 +33,48 @@ function goodhelp_conf_goodhelp_topic_id_options() {
     'noc_forum',
   );
 }
+
+/**
+ * Implements hook_block_info().
+ */
+function goodhelp_conf_block_info() {
+  $blocks = array();
+
+  $blocks['goodhelp_conf_book_nav'] = array(
+    'info' => 'HMS: Goodhelp Book Nav',
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function goodhelp_conf_block_view($delta) {
+  $block = array();
+
+  switch ($delta) {
+    case 'goodhelp_conf_book_nav':
+      $block['subject'] = t('Contents');
+      $block['content'] = goodhelp_conf_book_nav_content();
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Returns a book menu themed using jquerymenu, for use in the Book Nav block.
+ */
+function goodhelp_conf_book_nav_content() {
+  // Get current book
+  if ($node = menu_get_object()) {
+    if (isset($node->book['bid'])) {
+      $menu_name = $node->book['menu_name'];
+      // Return themed menu.
+      return theme('jquerymenu_menu', array('tree' => menu_tree_all_data($menu_name), 'trail' => menu_get_active_trail()));
+    }
+  }
+  return '';
+}

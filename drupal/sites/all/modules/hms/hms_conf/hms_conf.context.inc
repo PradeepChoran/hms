@@ -29,9 +29,9 @@ function hms_conf_context_default_contexts() {
   $context->reactions = array(
     'block' => array(
       'blocks' => array(
-        'book-navigation' => array(
-          'module' => 'book',
-          'delta' => 'navigation',
+        'goodhelp_conf-goodhelp_conf_book_nav' => array(
+          'module' => 'goodhelp_conf',
+          'delta' => 'goodhelp_conf_book_nav',
           'region' => 'sidebar_first',
           'weight' => '-10',
         ),
