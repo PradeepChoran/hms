@@ -10,9 +10,9 @@
 function hms_content_wysiwyg_default_profiles() {
   $profiles = array();
 
-  // Exported profile: plain_text
-  $profiles['plain_text'] = array(
-    'format' => 'plain_text',
+  // Exported profile: basic_html
+  $profiles['basic_html'] = array(
+    'format' => 'basic_html',
     'editor' => 'ckeditor',
     'settings' => array(
       'default' => 1,
@@ -23,23 +23,28 @@ function hms_content_wysiwyg_default_profiles() {
       'buttons' => array(
         'default' => array(
           'Bold' => 1,
-          'Underline' => 1,
-          'Strike' => 1,
+          'Italic' => 1,
+          'JustifyLeft' => 1,
+          'JustifyCenter' => 1,
+          'JustifyRight' => 1,
+          'JustifyBlock' => 1,
           'BulletedList' => 1,
           'NumberedList' => 1,
+          'Outdent' => 1,
           'Indent' => 1,
           'Undo' => 1,
           'Redo' => 1,
           'Link' => 1,
           'Unlink' => 1,
-          'Image' => 1,
-          'Blockquote' => 1,
+          'Anchor' => 1,
           'PasteFromWord' => 1,
           'RemoveFormat' => 1,
-          'Styles' => 1,
+          'SpecialChar' => 1,
           'Table' => 1,
-          'Replace' => 1,
-          'SpellChecker' => 1,
+          'Scayt' => 1,
+        ),
+        'drupal' => array(
+          'media' => 1,
         ),
       ),
       'toolbar_loc' => 'top',
