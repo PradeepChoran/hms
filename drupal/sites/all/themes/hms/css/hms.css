@@ -2,3 +2,10 @@
 body.client-site #main {
   margin-top: 0;
 }
+
+body.client-site .sidebar div.block {
+  height: 290px;
+  position: fixed;
+  width: 168px;
+  background-color: #F6F1D1;
+}
