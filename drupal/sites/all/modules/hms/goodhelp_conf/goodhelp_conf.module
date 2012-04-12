@@ -28,9 +28,31 @@ function goodhelp_conf_goodhelp_product_info() {
  */
 function goodhelp_conf_goodhelp_topic_id_options() {
   return array(
-    'noc_directory',
+    'noc_ann',
+    'noc_audio',
+    'noc_biography',
     'noc_blog',
+    'noc_bookmark',
+    'noc_calendar',
+    'noc_dailyupdate',
+    'noc_file',
     'noc_forum',
+    'noc_freehtml',
+    'noc_image',
+    'noc_link',
+    'noc_org',
+    'noc_page',
+    'noc_people',
+    'noc_poll',
+    'noc_promo',
+    'noc_qna',
+    'noc_rss',
+    'noc_section',
+    'noc_story',
+    'noc_task',
+    'noc_uwall',
+    'noc_video',
+    'noc_wiki',
   );
 }
 
