@@ -1,0 +1,8 @@
+name = "hms_user"
+core = "7.x"
+package = "Features"
+php = "5.2.4"
+dependencies[] = "features"
+dependencies[] = "tokenauth"
+features[user_permission][] = "access tokenauth"
+features[user_permission][] = "administer tokenauth"
