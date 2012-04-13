@@ -102,6 +102,15 @@ function goodhelp_preview_page() {
     '#size' => 20,
     '#default_value' => isset($_GET['version']) ? $_GET['version'] : '',
   );
+  $form['goodhelp_preview_form']['size'] = array(
+    '#type' => 'select',
+    '#title' => 'Size',
+    '#options' => array(
+      'manual' => t('Full (Manual)'),
+      'tip' => t('Small (Tooltip)'),
+    ),
+    '#default_value' => isset($_GET['size']) ? $_GET['size'] : '',
+  );
   $form['goodhelp_preview_form']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Preview',
@@ -115,10 +124,16 @@ function goodhelp_preview_page() {
   $form['goodhelp_preview']['preview'] = array(
     '#markup' => t('Select parameters.'),
   );
-  if (!empty($_GET['topic']) && !empty($_GET['product']) && !empty($_GET['version'])) {
-    $node = goodhelp_topic_load($_GET['topic'], $_GET['product'], $_GET['version']);
-    if (isset($node->nid)) {
-      $form['goodhelp_preview']['preview']['#markup'] = drupal_render(node_view($node, 'full'));
+  
+  // Get the services response for these parameters and show the preview.
+  if (!empty($_GET['topic']) && !empty($_GET['product']) && !empty($_GET['version']) && !empty($_GET['size'])) {
+    module_load_include('inc', 'services', 'services.runtime');
+    try {
+      $response = _goodhelp_services_retrieve($_GET['topic'], $_GET['product'], $_GET['version'], $_GET['size']);
+    }
+    catch (ServicesException $e) {}
+    if (isset($response['response']['message'])) {
+      $form['goodhelp_preview']['preview']['#markup'] = $response['response']['message'];
     }
     else {
       $form['goodhelp_preview']['preview']['#markup'] = '<strong>' . t('No topic found.') . '</strong>';
