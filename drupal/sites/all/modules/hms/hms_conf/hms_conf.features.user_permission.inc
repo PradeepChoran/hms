@@ -142,6 +142,15 @@ function hms_conf_user_default_permissions() {
     'module' => 'goodhelp',
   );
 
+  // Exported permission: use text format basic_html
+  $permissions['use text format basic_html'] = array(
+    'name' => 'use text format basic_html',
+    'roles' => array(
+      0 => 'editor',
+    ),
+    'module' => 'filter',
+  );
+
   // Exported permission: view own unpublished content
   $permissions['view own unpublished content'] = array(
     'name' => 'view own unpublished content',
