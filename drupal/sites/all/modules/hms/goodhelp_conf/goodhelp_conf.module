@@ -34,12 +34,15 @@ function goodhelp_conf_goodhelp_topic_id_options() {
     'noc_blog',
     'noc_bookmark',
     'noc_calendar',
+    'noc_chatterbox',
     'noc_dailyupdate',
+    'noc_directory',
     'noc_file',
     'noc_forum',
     'noc_freehtml',
     'noc_image',
     'noc_link',
+    'noc_memberinfo',
     'noc_org',
     'noc_page',
     'noc_people',
@@ -53,6 +56,7 @@ function goodhelp_conf_goodhelp_topic_id_options() {
     'noc_uwall',
     'noc_video',
     'noc_wiki',
+    'go_activitystream',
   );
 }
 
