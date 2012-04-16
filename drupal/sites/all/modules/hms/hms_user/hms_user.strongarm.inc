@@ -22,6 +22,7 @@ function hms_user_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'tokenauth_pages';
   $strongarm->value = 'goodhelp/services/*
+goodhelp/manual/*
 node/*';
   $export['tokenauth_pages'] = $strongarm;
 

@@ -12,3 +12,4 @@ features[user_permission][] = "administer tokenauth"
 features[variable][] = "tokenauth_length"
 features[variable][] = "tokenauth_pages"
 features[variable][] = "tokenauth_text"
+
