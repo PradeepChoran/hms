@@ -75,6 +75,11 @@ function hms_conf_context_default_contexts() {
   $context->description = '';
   $context->tag = '';
   $context->conditions = array(
+    'context' => array(
+      'values' => array(
+        '~book' => '~book',
+      ),
+    ),
     'sitewide' => array(
       'values' => array(
         1 => 1,
@@ -93,7 +98,7 @@ function hms_conf_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
   $export['sitewide'] = $context;
 
   return $export;
