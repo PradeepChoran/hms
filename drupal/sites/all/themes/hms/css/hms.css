@@ -1,10 +1,10 @@
 /* Remove the margin from the top of the page */
-body.client-site #main {
+.client-site #main {
   margin-top: 0;
 }
 
-body.client-site .sidebar div.block {
-  height: 290px;
-  position: fixed;
-  width: 168px;
+/* Remove the grey background color */
+.client-site #page-wrapper, 
+.client-site #footer-wrapper {
+  background-color: #ffffff;
 }
