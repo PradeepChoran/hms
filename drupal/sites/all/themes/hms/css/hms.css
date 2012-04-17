@@ -1,10 +1,10 @@
 /* Remove the margin from the top of the page */
-.client-site #main {
+body.not-logged-in #main {
   margin-top: 0;
 }
 
 /* Remove the grey background color */
-.client-site #page-wrapper, 
-.client-site #footer-wrapper {
+body.not-logged-in #page-wrapper, 
+body.not-logged-in #footer-wrapper {
   background-color: #ffffff;
 }
