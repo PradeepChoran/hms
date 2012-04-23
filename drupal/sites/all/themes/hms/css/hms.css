@@ -8,3 +8,14 @@ body.not-logged-in #page-wrapper,
 body.not-logged-in #footer-wrapper {
   background-color: #ffffff;
 }
+
+/* Move around the views exposed filter form elements */
+div.views-exposed-widget.views-submit-button {
+  padding-right: 0;
+}
+
+#edit-submit-topic-search {
+  margin-top: 0;
+  margin-right: 0;
+  padding: 3px 5px;
+}
