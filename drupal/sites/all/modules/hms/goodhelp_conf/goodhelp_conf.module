@@ -104,3 +104,14 @@ function goodhelp_conf_book_nav_content() {
   }
   return '';
 }
+
+/**
+ * Implements hook_views_pre_build().
+ */
+function goodhelp_conf_views_pre_build(&$view) {
+  if ($view->name == 'topic_search') {
+    // Set the override path to the current page. This will redirect the back view to
+    // the current page when submitted in case AJAX fails.
+    $view->override_path = $_GET['q'];
+  }
+}
