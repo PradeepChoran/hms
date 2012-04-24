@@ -20,6 +20,13 @@ function goodhelp_conf_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'goodhelp_fallback_default';
+  $strongarm->value = '4.9';
+  $export['goodhelp_fallback_default'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'goodhelp_max_versions';
   $strongarm->value = array(
     'noc' => '4',
