@@ -33,17 +33,32 @@ function goodhelp_settings_form() {
       '#default_value' => $max[$product],
     );
   }
-  
-  // Fallback settings.
-  $form['goodhelp_fallback'] = array(
-    '#type' => 'radios',
+
+  $form['goodhelp_fallback_settings'] = array(
+    '#type' => 'fieldset',
     '#title' => 'Fallback Settings',
+    '#description' => t('Determine how Good Help will choose a version to serve when a topic is requested through the service or the manual.'),
+    '#tree' => FALSE,
+  );
+
+  // Fallback settings.
+  $form['goodhelp_fallback_settings']['goodhelp_fallback'] = array(
+    '#type' => 'radios',
+    '#title' => 'Attempt Fallback',
     '#options' => array(
       0 => t('No Fallback'),
       2 => t('Fall back to topics within the requested second level version (i.e. 4.7.4 falls back to 4.7.2, 4.7)'),
       1 => t('Fall back to topics within the requested first level version (i.e. 4.7 falls back to 4.5)'),
     ),
     '#default_value' => variable_get('goodhelp_fallback', 2),
+  );
+  
+  $form['goodhelp_fallback_settings']['goodhelp_fallback_default'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Default Version',
+    '#description' => t("If this is set, it will be used as a last resort in case no appropriate version can be found using the 'Attempt Fallback' settings above. Use this if you want to guarantee that some version will always be selected, for instance if an incorrect version is requested or if a version is requested that is lower than any available."),
+    '#default_value' => variable_get('goodhelp_fallback_default', ''),
+    '#size' => 15,
   );
   
   // Some validation.

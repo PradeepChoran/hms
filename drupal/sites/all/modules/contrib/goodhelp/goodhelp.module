@@ -148,7 +148,7 @@ function goodhelp_select_version($options, $target) {
   if (in_array($target, $options)) {
     $result = $target;
   }
-  else {
+  elseif (!empty($options)) {
     // If fallback is allowed at all...
     $fallback_settings = variable_get('goodhelp_fallback', 0);
     if ($fallback_settings != 0) {
@@ -173,6 +173,13 @@ function goodhelp_select_version($options, $target) {
         else {
           break;
         }
+      }
+    }
+    // If a version has still not been found, check for a default.
+    if (!$result) {
+      $default = variable_get('goodhelp_fallback_default', '');
+      if ($default != '' && in_array($default, $options)) {
+        $result = $default;
       }
     }
   }
