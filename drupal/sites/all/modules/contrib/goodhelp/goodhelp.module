@@ -291,6 +291,10 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
       ),
       '#suffix' => '</div>'
     );
+  }
+  else {
+    $form['field_goodhelp_topic_version']['#suffix'] = '</div>';
+  }
   
   // Update the version field if there is a product selected in form_state.
   if (isset($form_state['values']['field_goodhelp_topic_product']['und'][0]['value'])) {
@@ -320,11 +324,10 @@ function goodhelp_form_goodhelp_topic_node_form_alter(&$form, &$form_state) {
     $form['goodhelp_topic_id_select']['#options'] = array();
   } 
 
-    // If there's a topic selected in the suggestion dropdown, fill the textfield.
-    if (isset($form_state['values']['goodhelp_topic_id_select'])) {
-      if ($form_state['values']['goodhelp_topic_id_select'] != '_none') {
-        $form['field_goodhelp_topic_id']['und'][0]['value']['#value'] = $form_state['values']['goodhelp_topic_id_select'];
-      }
+  // If there's a topic selected in the suggestion dropdown, fill the textfield.
+  if (isset($form_state['values']['goodhelp_topic_id_select'])) {
+    if ($form_state['values']['goodhelp_topic_id_select'] != '_none') {
+      $form['field_goodhelp_topic_id']['und'][0]['value']['#value'] = $form_state['values']['goodhelp_topic_id_select'];
     }
   }
 }
