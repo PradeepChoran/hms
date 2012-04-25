@@ -20,6 +20,12 @@ function goodhelp_conf_goodhelp_product_info() {
         '4.10',
       ),
     ),
+    'hms' => array(
+      'name' => t('Help Management System'),
+      'versions' => array(
+        '1.0',
+      ),
+    ),
   );
 }
 
