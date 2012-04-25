@@ -113,6 +113,9 @@ function goodhelp_structure_form_goodhelp_topic_node_form_alter(&$form, &$form_s
       $form['field_goodhelp_topic_product']['und']['#disabled'] = TRUE;
       $form['field_goodhelp_topic_version']['und']['#options'] = drupal_map_assoc(array($version));
       $form['field_goodhelp_topic_version']['und']['#default_value'] = $version;
+      if (isset($form['goodhelp_topic_id_select'])) {
+        $form['goodhelp_topic_id_select']['#options'] = goodhelp_get_topic_id_options($product);
+      }
     }
   }
   elseif (isset($type)) {
