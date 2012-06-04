@@ -1,0 +1,19 @@
+<?php
+/**
+ * @file
+ * Code for HMS Book Clone.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function hms_book_clone_menu() {
+  $items['goodhelp/clone/%'] = array(
+    'title' => 'Clone Help Book',
+    'page callback' => 'hms_book_clone_clone_form',
+    'access arguments' => array('access content'),
+    'page arguments' => array(2),
+    'file' => 'hms_book_clone.pages.inc',
+  );
+  return $items;
+}

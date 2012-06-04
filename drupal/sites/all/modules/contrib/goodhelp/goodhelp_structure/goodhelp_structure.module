@@ -175,6 +175,7 @@ function goodhelp_structure_get_book_info($bid) {
   $info = array(
     'product' => $product,
     'version' => $version,
+    'name' => $node->title,
   );
   return $info;
 }

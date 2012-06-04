@@ -1,0 +1,8 @@
+name = "HMS Book Clone"
+description = "Book cloning for the HMS"
+core = "7.x"
+package = "HMS"
+php = "5.2.4"
+dependencies[] = "book"
+dependencies[] = "goodhelp"
+dependencies[] = "goodhelp_structure"
