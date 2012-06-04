@@ -22,13 +22,22 @@ function hms_book_clone_clone_form($bid) {
     '#markup' => t('@name (@product version @version)', array('@name' => $book_info['name'], '@product' => $product, '@version' => $book_info['version'])),
   );
 
+  // Unset the version of the book we're cloning. New book has to have different version.
+  if (isset($version_options[$book_info['version']])) {
+    unset($version_options[$book_info['version']]);
+  }
   $form['version'] = array(
     '#type' => 'select',
-    '#title' => t('Cloning to Version'),
+    '#title' => t('Clone to Version'),
     '#description' => t('Select the version for the new book'),
     '#options' => $version_options,
   );
-  
+
+  $form['clone'] = array(
+    '#type' => 'submit',
+    '#value' => t('Clone'),
+  );
+
   $form['#validate'] = 'hms_book_clone_clone_form_validate';
   $form['#submit'] = 'hms_book_clone_clone_form_submit';
   return $form;
