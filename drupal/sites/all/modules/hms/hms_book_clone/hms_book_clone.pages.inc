@@ -10,8 +10,16 @@
  * @param $bid
  *  the book id of the book that will be cloned.
  */
-function hms_book_clone_clone_form($bid) {
+function hms_book_clone_clone_form($form_state) {
   $form = array();
+  
+  if (is_numeric(arg(2))) {
+    $bid = arg(2);
+  }
+  else {
+    drupal_not_found();
+  }
+
   $book_info = goodhelp_structure_get_book_info($bid);
   $product = $book_info['product'];
   $version_options = goodhelp_version_options($product);
@@ -38,21 +46,8 @@ function hms_book_clone_clone_form($bid) {
     '#value' => t('Clone'),
   );
 
-  $form['#validate'] = 'hms_book_clone_clone_form_validate';
-  $form['#submit'] = 'hms_book_clone_clone_form_submit';
+  $form['#submit'] = array('hms_book_clone_batch');
   return $form;
 }
 
-/**
- * Validate callback for the clone form.
- */
-function hms_book_clone_clone_form_validate($form, $form_state) {
-  
-}
 
-/**
- * Submit callback for the clone form.
- */
-function hms_book_clone_clone_form_submit($form, $form_state) {
-  
-}
